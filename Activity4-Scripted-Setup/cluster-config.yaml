@@ -1,0 +1,79 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: training-cluster
+  region: ap-southeast-1
+  version: "1.28"
+  tags:
+    Project: EKS-Training
+    Activity: Activity4-Scripted
+    Environment: Development
+
+# VPC Configuration - Cost Optimized
+vpc:
+  cidr: 10.0.0.0/16
+  autoAllocateIPv6: false
+  nat:
+    gateway: Disable  # Save $32/month by using public subnets only
+
+# Managed Node Group - Cost Optimized
+managedNodeGroups:
+  - name: training-nodes
+    # Instance Configuration
+    instanceType: t3.medium  # 2 vCPU, 4GB RAM
+    spot: true  # 70% cost savings!
+    
+    # Capacity
+    minSize: 2
+    maxSize: 2
+    desiredCapacity: 2
+    
+    # Networking - Public subnets (no NAT Gateway needed)
+    privateNetworking: false
+    
+    # Storage - Cost optimized
+    volumeSize: 20  # GB
+    volumeType: gp3  # Cheaper than gp2
+    
+    # Labels for pod scheduling
+    labels:
+      role: training
+      environment: development
+      nodegroup-type: managed
+    
+    # Tags for cost tracking
+    tags:
+      Project: EKS-Training
+      Activity: Activity4
+      NodeGroup: training-nodes
+      ManagedBy: eksctl
+    
+    # IAM Policies
+    iam:
+      withAddonPolicies:
+        imageBuilder: true  # Build container images
+        autoScaler: true    # For cluster autoscaler (Activity 5)
+        ebs: true           # EBS CSI driver
+        cloudWatch: true    # Send logs to CloudWatch
+        albIngress: false   # Not needed yet (Activity 5)
+
+# CloudWatch Logging (Optional - increases cost)
+# Short retention = minimal cost
+cloudWatch:
+  clusterLogging:
+    enableTypes:
+      - api      # API server logs
+      - audit    # Audit logs
+    logRetentionInDays: 1  # Minimal retention to reduce cost
+
+# Add-ons (optional - can be installed later)
+# Uncomment if you want to install during cluster creation
+#addons:
+#  - name: vpc-cni
+#    version: latest
+#  - name: coredns
+#    version: latest
+#  - name: kube-proxy
+#    version: latest
+

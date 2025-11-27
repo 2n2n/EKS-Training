@@ -1,0 +1,101 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: training-cluster-advanced
+  region: ap-southeast-1
+  version: "1.28"
+  tags:
+    Project: EKS-Training
+    Activity: Activity5-Advanced
+    Environment: Production-Like
+
+# VPC Configuration
+vpc:
+  cidr: 10.0.0.0/16
+  autoAllocateIPv6: false
+  nat:
+    gateway: Disable  # Still using public subnets
+
+# Managed Node Group with Auto-Scaling
+managedNodeGroups:
+  - name: advanced-nodes
+    # Instance Configuration
+    instanceType: t3.medium
+    spot: true  # Still saving costs!
+    
+    # Auto-Scaling Configuration
+    minSize: 2      # Minimum nodes
+    maxSize: 5      # Maximum nodes for scaling
+    desiredCapacity: 2  # Starting capacity
+    
+    # Networking
+    privateNetworking: false
+    
+    # Storage
+    volumeSize: 20
+    volumeType: gp3
+    
+    # Labels
+    labels:
+      role: advanced-training
+      environment: production-like
+      autoscaling: enabled
+    
+    # Tags
+    tags:
+      Project: EKS-Training
+      Activity: Activity5
+      NodeGroup: advanced-nodes
+      ManagedBy: eksctl
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/training-cluster-advanced: "owned"
+    
+    # IAM Policies - All enabled for advanced features
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true      # For Cluster Autoscaler
+        ebs: true             # For EBS CSI driver
+        cloudWatch: true      # For logging/monitoring
+        albIngress: true      # For ALB Controller - NEW!
+        externalDNS: false    # Optional, for Route53 integration
+
+# CloudWatch Logging
+cloudWatch:
+  clusterLogging:
+    enableTypes:
+      - api
+      - audit
+      - authenticator
+      - controllerManager
+      - scheduler
+    logRetentionInDays: 7  # Longer retention for production-like
+
+# IAM OIDC Provider (required for ALB Controller)
+iam:
+  withOIDC: true
+  serviceAccounts:
+  # Service account for AWS Load Balancer Controller
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+  
+  # Service account for Cluster Autoscaler
+  - metadata:
+      name: cluster-autoscaler
+      namespace: kube-system
+    wellKnownPolicies:
+      autoScaler: true
+
+# Add-ons
+addons:
+  - name: vpc-cni
+    version: latest
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+
