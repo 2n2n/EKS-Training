@@ -8,6 +8,7 @@ Welcome to Activity 4! After manually creating a cluster in Activity 3, you'll n
 
 By the end of this activity, you will:
 
+- ✅ Understand Kubernetes workload types (Jobs, StatefulSets, etc.)
 - ✅ Create EKS cluster using eksctl (one command!)
 - ✅ Understand Infrastructure as Code (IaC)
 - ✅ Deploy microservices Todo app (Frontend + Backend separately)
@@ -23,14 +24,15 @@ By the end of this activity, you will:
 
 | Step | Task | Time |
 |------|------|------|
-| 00 | Understand Monolith vs Microservices | 20 min |
+| 00a | Kubernetes Primitives Overview | 15 min |
+| 00b | Understand Monolith vs Microservices | 20 min |
 | 01 | Review cluster-config.yaml | 30 min |
 | 02 | Create cluster with eksctl | 5 min + 20 min wait |
 | 03 | Deploy microservices app | 30 min |
 | 04 | Testing and verification | 15 min |
 | 05 | Cleanup | 5 min + 10 min wait |
 
-**Active time:** ~1.75 hours  
+**Active time:** ~2 hours  
 **Wait time:** ~30 minutes  
 **Cleanup:** ~15 minutes
 
@@ -88,6 +90,7 @@ Activity4-Scripted-Setup/
 ├── README.md (this file)
 ├── ARCHITECTURE.md (architecture comparison)
 ├── cluster-config.yaml (EKS configuration)
+├── 00-Kubernetes-Primitives-Overview.md (NEW!)
 ├── 00-Monolith-vs-Microservices-Practice.md
 ├── 01-Config-Explained.md
 ├── 02-Eksctl-Deployment.md
@@ -170,33 +173,40 @@ eksctl delete cluster --name training-cluster --region ap-southeast-1
 
 ### For Complete Understanding
 
-1. **[00-Monolith-vs-Microservices-Practice.md](00-Monolith-vs-Microservices-Practice.md)** - Start here!
+1. **[00-Kubernetes-Primitives-Overview.md](00-Kubernetes-Primitives-Overview.md)** - NEW! Start here!
+   - Understand Kubernetes workload types
+   - Jobs, CronJobs, StatefulSets, DaemonSets
+   - Secrets, ConfigMaps, Persistent Volumes
+   - When to use each primitive
+   - **Note:** Conceptual overview; hands-on labs in Activity 5
+
+2. **[00-Monolith-vs-Microservices-Practice.md](00-Monolith-vs-Microservices-Practice.md)** - Architecture comparison
    - Compare Activity 3 (monolith) vs Activity 4 (microservices)
    - Understand when to use each approach
    - See pros and cons
 
-2. **[01-Config-Explained.md](01-Config-Explained.md)** - Understand the YAML
+3. **[01-Config-Explained.md](01-Config-Explained.md)** - Understand the YAML
    - Line-by-line explanation of `cluster-config.yaml`
    - Why each setting matters
    - Cost implications
 
-3. **[02-Eksctl-Deployment.md](02-Eksctl-Deployment.md)** - Create the cluster
+4. **[02-Eksctl-Deployment.md](02-Eksctl-Deployment.md)** - Create the cluster
    - Run eksctl create cluster
    - Monitor progress
    - Verify cluster is ready
 
-4. **[03-Deploy-Application.md](03-Deploy-Application.md)** - Deploy microservices
+5. **[03-Deploy-Application.md](03-Deploy-Application.md)** - Deploy microservices
    - Apply Kubernetes manifests
    - Understand service-to-service communication
    - Configure kubectl
 
-5. **[04-Verification.md](04-Verification.md)** - Test everything
+6. **[04-Verification.md](04-Verification.md)** - Test everything
    - Verify pods running
    - Test frontend access
    - Test backend API
    - Verify microservices communication
 
-6. **[05-CLEANUP.md](05-CLEANUP.md)** - ⚠️ Delete everything
+7. **[05-CLEANUP.md](05-CLEANUP.md)** - ⚠️ Delete everything
    - One command cleanup
    - Verify deletion
    - Check no charges
@@ -279,6 +289,7 @@ You know:
 
 ### After Activity 4 (Scripted)
 You know:
+- Different Kubernetes workload types
 - How to automate everything
 - How to use IaC
 - How microservices work
@@ -435,7 +446,9 @@ aws cloudformation list-stacks --region ap-southeast-1
 
 ---
 
-**Ready to see automation magic?** Start with [00-Monolith-vs-Microservices-Practice.md](00-Monolith-vs-Microservices-Practice.md)!
+**Ready to see automation magic?** Start with [00-Kubernetes-Primitives-Overview.md](00-Kubernetes-Primitives-Overview.md) to understand Kubernetes workload types, then proceed to [00-Monolith-vs-Microservices-Practice.md](00-Monolith-vs-Microservices-Practice.md)!
 
 **Remember:** Activity 3 taught you the details. Activity 4 shows you the production way! 🚀
+
+**Note:** Hands-on labs for Jobs, Secrets, StatefulSets, and Persistent Volumes are in Activity 5, Part A.
 

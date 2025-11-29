@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <!-- Styles -->
+  <style>
+    .state { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 10; ry: 10; }
+    .state-text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; fill: #0d47a1; }
+    .arrow { stroke: #555; stroke-width: 2; marker-end: url(#arrowhead); fill: none; }
+    .action-text { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; fill: #333; font-style: italic; }
+  </style>
+
+  <!-- Marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle">Docker Container Lifecycle</text>
+
+  <!-- States -->
+  <!-- 1. Created -->
+  <rect x="50" y="150" width="100" height="50" class="state" />
+  <text x="100" y="175" class="state-text">Created</text>
+
+  <!-- 2. Running -->
+  <rect x="250" y="150" width="100" height="50" class="state" style="fill: #c8e6c9; stroke: #388e3c;" />
+  <text x="300" y="175" class="state-text" style="fill: #1b5e20;">Running</text>
+
+  <!-- 3. Paused -->
+  <rect x="250" y="280" width="100" height="50" class="state" style="fill: #fff9c4; stroke: #fbc02d;" />
+  <text x="300" y="305" class="state-text" style="fill: #f57f17;">Paused</text>
+
+  <!-- 4. Stopped -->
+  <rect x="450" y="150" width="100" height="50" class="state" style="fill: #ffcdd2; stroke: #d32f2f;" />
+  <text x="500" y="175" class="state-text" style="fill: #b71c1c;">Exited</text>
+
+  <!-- 5. Deleted -->
+  <rect x="650" y="150" width="100" height="50" class="state" style="stroke-dasharray: 5,5;" />
+  <text x="700" y="175" class="state-text">Deleted</text>
+
+  <!-- Transitions -->
+  
+  <!-- Image -> Created -->
+  <line x1="10" y1="175" x2="50" y2="175" class="arrow" />
+  <text x="30" y="165" class="action-text">create</text>
+
+  <!-- Created -> Running -->
+  <line x1="150" y1="175" x2="250" y2="175" class="arrow" />
+  <text x="200" y="165" class="action-text">start</text>
+
+  <!-- Running <-> Paused -->
+  <line x1="280" y1="200" x2="280" y2="280" class="arrow" />
+  <text x="270" y="240" class="action-text" style="text-anchor: end;">pause</text>
+  
+  <line x1="320" y1="280" x2="320" y2="200" class="arrow" />
+  <text x="330" y="240" class="action-text" style="text-anchor: start;">unpause</text>
+
+  <!-- Running -> Stopped -->
+  <line x1="350" y1="175" x2="450" y2="175" class="arrow" />
+  <text x="400" y="165" class="action-text">stop</text>
+
+  <!-- Running -> Stopped (Kill) -->
+  <path d="M 350 160 Q 400 120 450 160" class="arrow" />
+  <text x="400" y="130" class="action-text" fill="red">kill</text>
+
+  <!-- Stopped -> Running (Restart) -->
+  <path d="M 460 200 Q 400 240 340 200" class="arrow" />
+  <text x="400" y="230" class="action-text">restart / start</text>
+
+  <!-- Stopped -> Deleted -->
+  <line x1="550" y1="175" x2="650" y2="175" class="arrow" />
+  <text x="600" y="165" class="action-text">rm</text>
+
+</svg>

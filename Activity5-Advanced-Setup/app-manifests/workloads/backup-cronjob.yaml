@@ -1,0 +1,86 @@
+---
+# CronJob for MySQL Backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-backup
+  namespace: default
+spec:
+  schedule: "0 2 * * *"  # Run at 2 AM every day
+  concurrencyPolicy: Forbid  # Don't start if previous backup still running
+  successfulJobsHistoryLimit: 7  # Keep last 7 successful backups
+  failedJobsHistoryLimit: 3  # Keep last 3 failed attempts
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: mysql-backup
+        spec:
+          containers:
+          - name: backup
+            image: mysql:8.0
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              BACKUP_FILE="/backup/mysql-backup-$(date +%Y%m%d-%H%M%S).sql"
+              echo "Starting backup at $(date)"
+              echo "Backup file: $BACKUP_FILE"
+              
+              # Perform mysqldump
+              mysqldump -h mysql -uroot -p${MYSQL_ROOT_PASSWORD} \
+                --all-databases \
+                --single-transaction \
+                --quick \
+                --lock-tables=false \
+                > $BACKUP_FILE
+              
+              # Check if backup was successful
+              if [ -f "$BACKUP_FILE" ]; then
+                BACKUP_SIZE=$(du -h $BACKUP_FILE | cut -f1)
+                echo "Backup completed successfully: $BACKUP_SIZE"
+                echo "File: $BACKUP_FILE"
+                
+                # In production, upload to S3 here:
+                # aws s3 cp $BACKUP_FILE s3://my-backup-bucket/mysql/
+                
+                # Clean up backups older than 30 days
+                find /backup -name "mysql-backup-*.sql" -type f -mtime +30 -delete
+                
+                echo "Backup process completed at $(date)"
+              else
+                echo "ERROR: Backup file not created!"
+                exit 1
+              fi
+            env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: mysql-backup-pvc
+
+---
+# PVC for backup storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-backup-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3
+  resources:
+    requests:
+      storage: 20Gi  # Adjust based on database size
+

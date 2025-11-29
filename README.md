@@ -62,18 +62,29 @@ Activity 4: Scripted Setup (2-2.5 hours)
 └── **Production approach**
     │
     ▼
-Activity 5: Advanced Setup (4-5 hours)
-├── Horizontal Pod Autoscaler
-├── Cluster Autoscaler
-├── Application Load Balancer
-├── SSL/TLS with ACM
-└── **Production-ready patterns**
+Activity 5: Advanced Setup (8-10 hours)
+├── Part A: Kubernetes Workloads (2-2.5 hours)
+│   ├── Jobs and CronJobs
+│   ├── Secrets and ConfigMaps
+│   ├── StatefulSets
+│   └── Persistent Volumes
+├── Part B: Networking & Scaling (3-3.5 hours)
+│   ├── Horizontal Pod Autoscaler
+│   ├── Cluster Autoscaler
+│   ├── Application Load Balancer
+│   └── SSL/TLS with ACM
+├── Part C: CI/CD Pipeline (3-4 hours)
+│   ├── Jenkins on Kubernetes
+│   ├── ECR Integration
+│   ├── Automated Pipelines
+│   └── GitOps Workflows
+└── **Complete production-ready setup**
 ```
 
 ### Time Investment
 
-- **Total Training Time:** 13-17 hours
-- **Spread Over:** 3-5 days recommended
+- **Total Training Time:** 18-23 hours
+- **Spread Over:** 4-6 days recommended
 - **Hands-on Focus:** 70% practical, 30% theory
 
 ---
@@ -172,18 +183,37 @@ EKS-Training/
 │   ├── README.md
 │   ├── ARCHITECTURE.md
 │   ├── cluster-config-advanced.yaml
-│   ├── 01-Metrics-Server.md
+│   ├── 08-Kubernetes-Workloads/  ← Part A
+│   │   ├── 08-01-Jobs-And-CronJobs.md
+│   │   ├── 08-02-Secrets-And-ConfigMaps.md
+│   │   ├── 08-03-StatefulSets.md
+│   │   └── 08-04-PersistentVolumes.md
+│   ├── 01-Metrics-Server.md  ← Part B
 │   ├── 02-HPA-Setup.md
 │   ├── 03-Cluster-Autoscaler.md
 │   ├── 04-ALB-Controller.md
 │   ├── 05-Ingress-SSL.md
 │   ├── 06-Load-Testing.md
 │   ├── 07-CLEANUP.md
-│   ├── cheatsheet.md
-│   └── app-manifests/
-│       ├── backend-hpa.yaml
-│       ├── frontend-hpa.yaml
-│       └── ingress.yaml
+│   ├── 09-CI-CD-Pipeline/  ← Part C
+│   │   ├── 09-01-Jenkins-Setup.md
+│   │   ├── 09-02-ECR-Integration.md
+│   │   ├── 09-03-Pipeline-Configuration.md
+│   │   └── 09-04-Automated-Deployment.md
+│   ├── app-manifests/
+│   │   ├── workloads/
+│   │   │   ├── mysql-statefulset.yaml
+│   │   │   ├── backup-cronjob.yaml
+│   │   │   ├── app-secrets.yaml
+│   │   │   └── app-configmap.yaml
+│   │   ├── backend-hpa.yaml
+│   │   ├── frontend-hpa.yaml
+│   │   └── ingress.yaml
+│   └── jenkins/
+│       ├── Jenkinsfile
+│       ├── jenkins-deployment.yaml
+│       ├── jenkins-pvc.yaml
+│       └── jenkins-service.yaml
 │
 └── sample-app/
     ├── backend/
@@ -232,19 +262,22 @@ EKS-Training/
 2. See automation benefits
 3. **Delete cluster when done**
 
-**Day 5: Production Patterns (4-5 hours)**
+**Days 5-6: Production Patterns (8-10 hours)**
 1. Complete Activity 5 - Advanced Setup
-2. Learn auto-scaling and load balancing
+   - Part A: Kubernetes Workloads (2-2.5 hours)
+   - Part B: Networking & Scaling (3-3.5 hours)
+   - Part C: CI/CD Pipeline (3-4 hours)
+2. Learn complete production-ready patterns
 3. **Delete everything when done**
 
 ### For Experienced Users
 
-**Fast Track (6-8 hours total):**
+**Fast Track (8-12 hours total):**
 1. Skim Activity 1 (review concepts)
 2. Install tools (Activity 2)
 3. **Skip Activity 3** or just read it
-4. Start with Activity 4 (scripted approach)
-5. Complete Activity 5 (advanced features)
+4. Complete Activity 4 (scripted approach)
+5. Complete Activity 5 Parts A, B, C (advanced features)
 
 ---
 
@@ -352,8 +385,11 @@ Keep these open in browser tabs:
 
 - **Pods**: Smallest deployable units
 - **Deployments**: Declarative updates for Pods
+- **StatefulSets**: Stateful applications
+- **Jobs & CronJobs**: Batch and scheduled tasks
 - **Services**: Stable network endpoints
 - **ConfigMaps & Secrets**: Configuration management
+- **Persistent Volumes**: Storage abstraction
 - **Namespaces**: Virtual clusters
 - **HPA**: Horizontal Pod Autoscaler
 - **Ingress**: HTTP/HTTPS routing
@@ -363,6 +399,9 @@ Keep these open in browser tabs:
 - Infrastructure as Code (IaC)
 - Declarative configuration
 - GitOps workflows
+- CI/CD pipelines with Jenkins
+- Docker image management with ECR
+- Automated deployments
 - Auto-scaling strategies
 - High availability patterns
 - Cost optimization
@@ -434,11 +473,14 @@ Use this checklist to track your progress:
 - [ ] Activity 2: Tools installed and verified
 - [ ] Activity 3: Manual cluster created and deleted
 - [ ] Activity 4: Scripted cluster created and deleted
-- [ ] Activity 5: Advanced features implemented and deleted
+- [ ] Activity 5 Part A: Kubernetes workloads mastered
+- [ ] Activity 5 Part B: Networking and scaling implemented
+- [ ] Activity 5 Part C: CI/CD pipeline operational
 - [ ] Understand when to use Kubernetes
 - [ ] Comfortable with kubectl commands
 - [ ] Can troubleshoot common issues
 - [ ] Know how to optimize costs
+- [ ] Can build and deploy with CI/CD
 
 ---
 
@@ -449,9 +491,13 @@ You've successfully completed the training when you can:
 ✅ Explain Kubernetes benefits and trade-offs  
 ✅ Create an EKS cluster using eksctl  
 ✅ Deploy applications to Kubernetes  
+✅ Work with Jobs, StatefulSets, and Persistent Volumes  
+✅ Manage configuration with Secrets and ConfigMaps  
 ✅ Troubleshoot common issues  
-✅ Implement auto-scaling  
+✅ Implement auto-scaling (pods and nodes)  
 ✅ Set up load balancing with SSL  
+✅ Build CI/CD pipelines with Jenkins  
+✅ Automate deployments from Git to Kubernetes  
 ✅ Understand cost implications  
 ✅ Know when NOT to use Kubernetes  
 

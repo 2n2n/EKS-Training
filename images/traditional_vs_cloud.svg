@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <!-- Styles -->
+  <style>
+    .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; fill: #333; }
+    .title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; fill: #222; }
+    .box { stroke: #333; stroke-width: 2; }
+    .server { fill: #e0e0e0; }
+    .os { fill: #90caf9; }
+    .app { fill: #a5d6a7; }
+    .vm { fill: #fff59d; }
+    .virt { fill: #ce93d8; }
+  </style>
+
+  <!-- Traditional Architecture -->
+  <text x="200" y="40" class="title">Traditional (Silos)</text>
+  
+  <!-- Server 1 -->
+  <g transform="translate(50, 80)">
+    <!-- Hardware -->
+    <rect x="0" y="200" width="120" height="60" class="box server" />
+    <text x="60" y="235" class="text">Hardware</text>
+    
+    <!-- OS -->
+    <rect x="0" y="140" width="120" height="60" class="box os" />
+    <text x="60" y="175" class="text">OS</text>
+    
+    <!-- App -->
+    <rect x="0" y="80" width="120" height="60" class="box app" />
+    <text x="60" y="115" class="text">App A</text>
+  </g>
+
+  <!-- Server 2 -->
+  <g transform="translate(230, 80)">
+    <!-- Hardware -->
+    <rect x="0" y="200" width="120" height="60" class="box server" />
+    <text x="60" y="235" class="text">Hardware</text>
+    
+    <!-- OS -->
+    <rect x="0" y="140" width="120" height="60" class="box os" />
+    <text x="60" y="175" class="text">OS</text>
+    
+    <!-- App -->
+    <rect x="0" y="80" width="120" height="60" class="box app" />
+    <text x="60" y="115" class="text">App B</text>
+  </g>
+
+  <!-- Divider -->
+  <line x1="400" y1="50" x2="400" y2="350" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5" />
+
+  <!-- Cloud Architecture -->
+  <text x="600" y="40" class="title">Cloud (Virtualization)</text>
+
+  <g transform="translate(450, 80)">
+    <!-- Shared Hardware Pool -->
+    <rect x="0" y="220" width="300" height="40" class="box server" />
+    <text x="150" y="245" class="text">Shared Hardware Pool</text>
+    
+    <!-- Virtualization Layer -->
+    <rect x="0" y="180" width="300" height="40" class="box virt" />
+    <text x="150" y="205" class="text">Hypervisor / Virtualization</text>
+    
+    <!-- VM 1 -->
+    <g transform="translate(20, 0)">
+      <rect x="0" y="100" width="120" height="80" class="box vm" />
+      <text x="60" y="145" class="text">VM 1 (OS+App)</text>
+    </g>
+    
+    <!-- VM 2 -->
+    <g transform="translate(160, 0)">
+      <rect x="0" y="100" width="120" height="80" class="box vm" />
+      <text x="60" y="145" class="text">VM 2 (OS+App)</text>
+    </g>
+  </g>
+
+</svg>

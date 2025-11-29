@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200">
+  <!-- Styles -->
+  <style>
+    .stage { fill: #e3f2fd; stroke: #2196f3; stroke-width: 2; rx: 10; ry: 10; }
+    .git { fill: #fff3e0; stroke: #ff9800; }
+    .jenkins { fill: #e0f2f1; stroke: #4caf50; }
+    .docker { fill: #e1f5fe; stroke: #03a9f4; }
+    .ecr { fill: #f3e5f5; stroke: #9c27b0; }
+    .eks { fill: #fff8e1; stroke: #ffc107; }
+    .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; fill: #333; font-weight: bold; }
+    .subtext { font-size: 11px; font-weight: normal; fill: #666; }
+    .arrow { stroke: #555; stroke-width: 2; marker-end: url(#arrowhead); }
+  </style>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+    </marker>
+  </defs>
+
+  <!-- 1. Git Push -->
+  <g transform="translate(20, 50)">
+    <rect x="0" y="0" width="140" height="80" class="stage git" />
+    <text x="70" y="30" class="text">Git Push</text>
+    <text x="70" y="55" class="text subtext">Source Code</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="160" y1="90" x2="200" y2="90" class="arrow" />
+
+  <!-- 2. Jenkins -->
+  <g transform="translate(200, 50)">
+    <rect x="0" y="0" width="140" height="80" class="stage jenkins" />
+    <text x="70" y="30" class="text">Jenkins</text>
+    <text x="70" y="55" class="text subtext">CI Server</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="340" y1="90" x2="380" y2="90" class="arrow" />
+
+  <!-- 3. Docker Build -->
+  <g transform="translate(380, 50)">
+    <rect x="0" y="0" width="140" height="80" class="stage docker" />
+    <text x="70" y="30" class="text">Docker Build</text>
+    <text x="70" y="55" class="text subtext">Build Image</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="520" y1="90" x2="560" y2="90" class="arrow" />
+
+  <!-- 4. ECR Push -->
+  <g transform="translate(560, 50)">
+    <rect x="0" y="0" width="140" height="80" class="stage ecr" />
+    <text x="70" y="30" class="text">ECR Push</text>
+    <text x="70" y="55" class="text subtext">Store Image</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="700" y1="90" x2="740" y2="90" class="arrow" />
+
+  <!-- 5. Deploy to EKS -->
+  <g transform="translate(740, 50)">
+    <rect x="0" y="0" width="140" height="80" class="stage eks" />
+    <text x="70" y="30" class="text">Deploy to EKS</text>
+    <text x="70" y="55" class="text subtext">Update Cluster</text>
+  </g>
+
+</svg>

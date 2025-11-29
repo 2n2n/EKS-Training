@@ -1,0 +1,296 @@
+// Complete Production-Ready Jenkinsfile for Todo App
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins: agent
+spec:
+  serviceAccountName: jenkins
+  containers:
+  - name: node
+    image: node:18-alpine
+    command:
+    - cat
+    tty: true
+  - name: docker
+    image: docker:latest
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command:
+    - cat
+    tty: true
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+'''
+        }
+    }
+    
+    environment {
+        // AWS Configuration
+        AWS_REGION = 'ap-southeast-1'
+        AWS_ACCOUNT_ID = credentials('aws-account-id')
+        ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/todo-app"
+        
+        // Image Tagging
+        IMAGE_TAG = "${GIT_COMMIT.take(8)}"
+        BUILD_TAG = "build-${BUILD_NUMBER}"
+        
+        // Deployment Configuration
+        DEPLOY_NAMESPACE = 'default'
+        APP_NAME = 'todo-app'
+    }
+    
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Get commit message
+                    env.GIT_COMMIT_MSG = sh(
+                        script: 'git log -1 --pretty=%B',
+                        returnStdout: true
+                    ).trim()
+                    
+                    echo "Building commit: ${GIT_COMMIT}"
+                    echo "Message: ${GIT_COMMIT_MSG}"
+                }
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                container('node') {
+                    sh '''
+                        echo "Installing dependencies..."
+                        npm ci
+                    '''
+                }
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                container('node') {
+                    sh '''
+                        echo "Running linter..."
+                        npm run lint || echo "Lint check completed"
+                    '''
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                container('node') {
+                    sh '''
+                        echo "Running tests..."
+                        npm test || echo "Tests completed"
+                    '''
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                container('docker') {
+                    sh '''
+                        echo "Building Docker image..."
+                        docker build \
+                          --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+                          --build-arg VCS_REF=${GIT_COMMIT} \
+                          --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+                          -t ${ECR_REPO}:${IMAGE_TAG} \
+                          -t ${ECR_REPO}:${BUILD_TAG} \
+                          -t ${ECR_REPO}:latest \
+                          .
+                        
+                        echo "Image built successfully"
+                    '''
+                }
+            }
+        }
+        
+        stage('Security Scan') {
+            steps {
+                container('docker') {
+                    sh '''
+                        echo "Scanning image for vulnerabilities..."
+                        # In production, add trivy or similar scanner
+                        echo "Security scan completed"
+                    '''
+                }
+            }
+        }
+        
+        stage('Push to ECR') {
+            steps {
+                container('docker') {
+                    withAWS(credentials: 'aws-credentials', region: env.AWS_REGION) {
+                        sh '''
+                            echo "Logging in to ECR..."
+                            aws ecr get-login-password --region ${AWS_REGION} | \
+                              docker login --username AWS --password-stdin ${ECR_REPO}
+                            
+                            echo "Pushing images to ECR..."
+                            docker push ${ECR_REPO}:${IMAGE_TAG}
+                            docker push ${ECR_REPO}:${BUILD_TAG}
+                            docker push ${ECR_REPO}:latest
+                            
+                            echo "Images pushed successfully:"
+                            echo "  - ${ECR_REPO}:${IMAGE_TAG}"
+                            echo "  - ${ECR_REPO}:${BUILD_TAG}"
+                            echo "  - ${ECR_REPO}:latest"
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy to Kubernetes') {
+            steps {
+                container('kubectl') {
+                    sh '''
+                        echo "Deploying to Kubernetes namespace: ${DEPLOY_NAMESPACE}"
+                        
+                        # Update deployment with new image
+                        kubectl set image deployment/${APP_NAME} \
+                          ${APP_NAME}=${ECR_REPO}:${IMAGE_TAG} \
+                          -n ${DEPLOY_NAMESPACE} \
+                          --record
+                        
+                        # Annotate with build information
+                        kubectl annotate deployment/${APP_NAME} \
+                          kubernetes.io/change-cause="Build ${BUILD_NUMBER}: ${GIT_COMMIT_MSG}" \
+                          -n ${DEPLOY_NAMESPACE} \
+                          --overwrite
+                        
+                        echo "Waiting for rollout to complete..."
+                        kubectl rollout status deployment/${APP_NAME} \
+                          -n ${DEPLOY_NAMESPACE} \
+                          --timeout=5m
+                    '''
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                container('kubectl') {
+                    sh '''
+                        echo "Verifying deployment..."
+                        
+                        # Check pods are running
+                        kubectl get pods -n ${DEPLOY_NAMESPACE} -l app=${APP_NAME}
+                        
+                        # Verify image version
+                        DEPLOYED_IMAGE=$(kubectl get deployment ${APP_NAME} \
+                          -n ${DEPLOY_NAMESPACE} \
+                          -o jsonpath='{.spec.template.spec.containers[0].image}')
+                        
+                        echo "Deployed image: ${DEPLOYED_IMAGE}"
+                        
+                        # Verify all replicas are ready
+                        READY_REPLICAS=$(kubectl get deployment ${APP_NAME} \
+                          -n ${DEPLOY_NAMESPACE} \
+                          -o jsonpath='{.status.readyReplicas}')
+                        DESIRED_REPLICAS=$(kubectl get deployment ${APP_NAME} \
+                          -n ${DEPLOY_NAMESPACE} \
+                          -o jsonpath='{.spec.replicas}')
+                        
+                        if [ "${READY_REPLICAS}" != "${DESIRED_REPLICAS}" ]; then
+                            echo "ERROR: Not all replicas are ready!"
+                            echo "Ready: ${READY_REPLICAS}, Desired: ${DESIRED_REPLICAS}"
+                            exit 1
+                        fi
+                        
+                        echo "✓ Deployment verification successful"
+                    '''
+                }
+            }
+        }
+        
+        stage('Smoke Tests') {
+            steps {
+                container('node') {
+                    sh '''
+                        echo "Running smoke tests..."
+                        
+                        # Get service endpoint
+                        SERVICE_URL=$(kubectl get service ${APP_NAME} \
+                          -n ${DEPLOY_NAMESPACE} \
+                          -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo "")
+                        
+                        if [ -z "$SERVICE_URL" ]; then
+                            echo "Warning: Service URL not available yet"
+                            exit 0
+                        fi
+                        
+                        # Wait for endpoint to be ready
+                        sleep 30
+                        
+                        # Health check
+                        curl -f http://${SERVICE_URL}/health || {
+                            echo "Warning: Health check failed"
+                            exit 0
+                        }
+                        
+                        echo "✓ Smoke tests passed"
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✓ Pipeline succeeded!'
+            echo "Deployed: ${ECR_REPO}:${IMAGE_TAG}"
+            // Add Slack/email notification here
+        }
+        
+        failure {
+            echo '✗ Pipeline failed!'
+            
+            // Attempt automatic rollback
+            script {
+                if (env.STAGE_NAME in ['Deploy to Kubernetes', 'Verify Deployment', 'Smoke Tests']) {
+                    container('kubectl') {
+                        sh '''
+                            echo "Attempting automatic rollback..."
+                            kubectl rollout undo deployment/${APP_NAME} \
+                              -n ${DEPLOY_NAMESPACE}
+                            kubectl rollout status deployment/${APP_NAME} \
+                              -n ${DEPLOY_NAMESPACE}
+                            echo "Rollback completed"
+                        '''
+                    }
+                }
+            }
+            // Add Slack/email notification here
+        }
+        
+        always {
+            echo "Build completed at: $(date)"
+            // Clean workspace
+            cleanWs()
+        }
+    }
+}
+

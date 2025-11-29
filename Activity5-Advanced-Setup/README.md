@@ -1,6 +1,6 @@
-# Activity 5: Advanced Setup - Production-Ready Patterns
+# Activity 5: Advanced Setup - Production-Ready Kubernetes
 
-Welcome to Activity 5! This is where you learn production-grade Kubernetes features: auto-scaling, load balancing, and SSL/TLS.
+Welcome to Activity 5! This comprehensive activity covers production-grade Kubernetes: workloads, networking, auto-scaling, and CI/CD.
 
 ---
 
@@ -8,279 +8,327 @@ Welcome to Activity 5! This is where you learn production-grade Kubernetes featu
 
 By the end of this activity, you will:
 
+**Part A: Kubernetes Workloads**
+- ✅ Work with Jobs and CronJobs
+- ✅ Manage Secrets and ConfigMaps
+- ✅ Deploy StatefulSets with persistent storage
+- ✅ Understand Persistent Volumes (PV/PVC)
+
+**Part B: Networking & Auto-Scaling**
 - ✅ Implement Horizontal Pod Autoscaler (HPA)
 - ✅ Configure Cluster Autoscaler
 - ✅ Deploy AWS Load Balancer Controller
 - ✅ Set up Application Load Balancer (ALB)
-- ✅ Configure SSL/TLS with AWS Certificate Manager
-- ✅ Understand production-ready patterns
-- ✅ Test auto-scaling under load
+
+**Part C: CI/CD Pipeline**
+- ✅ Deploy Jenkins on Kubernetes
+- ✅ Configure ECR integration
+- ✅ Build automated pipelines
+- ✅ Implement GitOps workflows
 
 ---
 
 ## ⏱️ Time Estimate
 
-**Total Time: 4-5 hours**
+**Total Time: 8-10 hours** (can be split over 2 days)
 
-| Step | Task | Time |
-|------|------|------|
-| 01 | Install Metrics Server | 20 min |
-| 02 | Configure HPA | 30 min |
-| 03 | Setup Cluster Autoscaler | 40 min |
-| 04 | Install ALB Controller | 40 min |
-| 05 | Configure Ingress with SSL | 40 min |
-| 06 | Load Testing | 30 min |
-| 07 | Cleanup | 15 min |
+| Part | Topic | Time |
+|------|-------|------|
+| **A** | Kubernetes Workloads | 2-2.5 hours |
+| **B** | Networking & Auto-Scaling | 3-3.5 hours |
+| **C** | CI/CD Pipeline | 3-4 hours |
 
-**Active time:** ~3-3.5 hours  
-**Wait time:** ~20 minutes  
-**Testing:** ~30 minutes  
-**Cleanup:** ~15 minutes
+**Recommended Schedule:**
+- Day 1: Parts A & B (5-6 hours)
+- Day 2: Part C (3-4 hours)
 
 ---
 
 ## 💰 Cost Warning
 
-**This activity costs MORE!**
+**This activity costs more than Activities 3-4!**
 
 ```
-Compared to Activities 3-4:
-├── EKS Control Plane: $0.10/hour ($2.40/day) - Same
-├── EC2 Nodes: $0.025/hour base ($0.60/day) - Same
-├── ALB: $0.0225/hour ($0.54/day) - NEW!
-├── Additional nodes during scaling: Variable
-├── Data Transfer (ALB): Minimal for testing
+Estimated costs while running:
+├── EKS Control Plane: $0.10/hour ($2.40/day)
+├── EC2 Nodes: $0.025-0.05/hour ($0.60-1.20/day)
+├── ALB: $0.0225/hour ($0.54/day)
+├── Jenkins: $0.03/hour ($0.72/day) - if on separate instance
+├── Storage (PVCs): $0.15/day
 └── Total: ~$5-7/day (~$0.20-0.30/hour)
 
 Monthly if left running: ~$150-210
 ```
 
-**⚠️ CRITICAL:** Delete ALB and cluster when done!
+**⚠️ CRITICAL:** Delete all resources when done!
 
 ---
 
-## 🏗️ What You'll Build
-
-```
-┌─────────────────────────────────────────────────────────┐
-│              Application Load Balancer (ALB)            │
-│              https://your-domain.com                    │
-│              SSL Certificate (ACM)                      │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│            Ingress Controller                           │
-│            Routes traffic to services                   │
-└─────────────────────────────────────────────────────────┘
-                          │
-              ┌───────────┴───────────┐
-              ▼                       ▼
-    ┌──────────────────┐    ┌──────────────────┐
-    │ Frontend Service │    │ Backend Service  │
-    │                  │    │                  │
-    │ HPA: 2-10 pods   │    │ HPA: 2-10 pods   │
-    │ Auto-scales      │    │ Auto-scales      │
-    └──────────────────┘    └──────────────────┘
-
-Cluster Autoscaler:
-- Monitors pod resource requests
-- Adds nodes when pods can't be scheduled
-- Removes nodes when underutilized
-- Min: 2 nodes, Max: 5 nodes
-```
-
----
-
-## 🚀 Advanced Features
-
-### 1. Horizontal Pod Autoscaler (HPA)
-
-**What:** Automatically scale pods based on CPU/memory usage
-
-```
-Load increases → CPU > 70% → Add more pods
-Load decreases → CPU < 30% → Remove pods
-
-Scales between:
-- Min: 2 pods
-- Max: 10 pods
-```
-
-### 2. Cluster Autoscaler
-
-**What:** Automatically scale nodes based on pod requirements
-
-```
-Pods pending (not enough resources) → Add node
-Nodes underutilized → Remove node
-
-Scales between:
-- Min: 2 nodes
-- Max: 5 nodes
-```
-
-### 3. Application Load Balancer (ALB)
-
-**What:** AWS-managed load balancer with advanced features
-
-```
-Benefits:
-✅ Layer 7 load balancing (HTTP/HTTPS)
-✅ SSL/TLS termination
-✅ Path-based routing
-✅ Host-based routing
-✅ Health checks
-✅ AWS-managed (high availability)
-```
-
-### 4. SSL/TLS with ACM
-
-**What:** Free SSL certificates from AWS
-
-```
-Features:
-✅ Automatic renewal
-✅ No cost
-✅ Trusted by browsers
-✅ Easy integration with ALB
-```
-
----
-
-## 📚 Files in This Activity
+## 📚 Activity Structure
 
 ```
 Activity5-Advanced-Setup/
-├── README.md
-├── ARCHITECTURE.md
+├── README.md (this file)
+├── ARCHITECTURE.md (overall architecture)
 ├── cluster-config-advanced.yaml
-├── 01-Metrics-Server.md
+│
+├── 08-Kubernetes-Workloads/  ← PART A
+│   ├── 08-01-Jobs-And-CronJobs.md
+│   ├── 08-02-Secrets-And-ConfigMaps.md
+│   ├── 08-03-StatefulSets.md
+│   └── 08-04-PersistentVolumes.md
+│
+├── 01-Metrics-Server.md  ← PART B
 ├── 02-HPA-Setup.md
 ├── 03-Cluster-Autoscaler.md
 ├── 04-ALB-Controller.md
 ├── 05-Ingress-SSL.md
 ├── 06-Load-Testing.md
-├── 07-CLEANUP.md
-├── cheatsheet.md
-└── app-manifests/
-    ├── backend-hpa.yaml
-    ├── frontend-hpa.yaml
-    └── ingress.yaml
+│
+├── 09-CI-CD-Pipeline/  ← PART C
+│   ├── 09-01-Jenkins-Setup.md
+│   ├── 09-02-ECR-Integration.md
+│   ├── 09-03-Pipeline-Configuration.md
+│   └── 09-04-Automated-Deployment.md
+│
+├── app-manifests/
+│   ├── workloads/
+│   │   ├── mysql-statefulset.yaml
+│   │   ├── backup-cronjob.yaml
+│   │   ├── app-secrets.yaml
+│   │   └── app-configmap.yaml
+│   ├── backend-hpa.yaml
+│   ├── frontend-hpa.yaml
+│   └── ingress.yaml
+│
+└── jenkins/
+    ├── Jenkinsfile
+    ├── jenkins-deployment.yaml
+    ├── jenkins-pvc.yaml
+    └── jenkins-service.yaml
+```
+
+---
+
+## 🏗️ What You'll Build
+
+### Part A: Kubernetes Workloads
+
+```
+Workloads:
+├── Jobs: One-time batch tasks
+├── CronJobs: Scheduled tasks (backups)
+├── Secrets: Secure credential storage
+├── ConfigMaps: Application configuration
+├── StatefulSets: MySQL with persistent storage
+└── Persistent Volumes: EBS-backed storage
+```
+
+### Part B: Networking & Auto-Scaling
+
+```
+┌─────────────────────────────────────────────┐
+│      Application Load Balancer (ALB)        │
+│      https://your-domain.com                │
+└─────────────────────────────────────────────┘
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+┌──────────────┐        ┌──────────────┐
+│  Frontend    │        │  Backend     │
+│  HPA: 2-10   │        │  HPA: 2-10   │
+│  Auto-scales │        │  Auto-scales │
+└──────────────┘        └──────────────┘
+
+Cluster Autoscaler:
+- Min: 2 nodes, Max: 5 nodes
+- Scales based on pod resource requests
+```
+
+### Part C: CI/CD Pipeline
+
+```
+Git Push → Webhook → Jenkins → Build → Test
+   ↓
+Docker Build → ECR Push → K8s Deploy → Verify
+
+Components:
+├── Jenkins on Kubernetes
+├── Dynamic build agents
+├── ECR for Docker images
+├── Automated deployments
+└── GitOps workflow
 ```
 
 ---
 
 ## 🎯 Quick Start
 
-**Prerequisites:**
+### Prerequisites
+
 - Completed Activity 4 (or understand eksctl)
-- Domain name (optional, can test without)
-- AWS Route 53 (optional, for SSL)
+- Tools installed (Activity 2)
+- AWS CLI configured
+- Budget alert set
+
+### Create Cluster
 
 ```bash
-# 1. Create cluster with advanced config
+# 1. Create cluster with advanced configuration
+cd Activity5-Advanced-Setup
 eksctl create cluster -f cluster-config-advanced.yaml
 
-# 2. Install metrics-server
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+# Wait 20 minutes for cluster creation
 
-# 3. Deploy application with HPA
-kubectl apply -f app-manifests/
-
-# 4. Install AWS Load Balancer Controller
-# (Follow guide 04-ALB-Controller.md)
-
-# 5. Create Ingress
-kubectl apply -f app-manifests/ingress.yaml
-
-# 6. Test auto-scaling
-# (Follow guide 06-Load-Testing.md)
-
-# 7. Cleanup
-eksctl delete cluster --name training-cluster-advanced --region ap-southeast-1
+# 2. Verify cluster
+kubectl get nodes
+kubectl get pods -A
 ```
 
 ---
 
-## 💡 Production Patterns You'll Learn
+## 📖 Learning Path
 
-### 1. Resource-Based Auto-Scaling
+### **Part A: Kubernetes Workloads** (Start Here!)
 
-```yaml
-HPA based on:
-├── CPU utilization
-├── Memory utilization
-└── Custom metrics (advanced)
+**Hands-on with core Kubernetes primitives:**
 
-Automatically maintains:
-├── Performance under load
-├── Cost optimization (scale down)
-└── Reliability (scale up)
-```
+1. **[08-01-Jobs-And-CronJobs.md](08-Kubernetes-Workloads/08-01-Jobs-And-CronJobs.md)**
+   - Create and manage Jobs
+   - Schedule tasks with CronJobs
+   - Database backup examples
+   - ⏱️ 30-40 min
 
-### 2. Infrastructure Auto-Scaling
+2. **[08-02-Secrets-And-ConfigMaps.md](08-Kubernetes-Workloads/08-02-Secrets-And-ConfigMaps.md)**
+   - Store application configuration
+   - Manage sensitive data securely
+   - Mount config as files or env vars
+   - ⏱️ 30-35 min
 
-```yaml
-Cluster Autoscaler:
-├── Node provisioning
-├── Node termination
-└── Cost optimization
+3. **[08-03-StatefulSets.md](08-Kubernetes-Workloads/08-03-StatefulSets.md)**
+   - Deploy MySQL with persistent storage
+   - Understand stable network identities
+   - Scale stateful applications
+   - ⏱️ 40-45 min
 
-Benefits:
-├── Never run out of capacity
-├── Pay only for what you need
-└── Fully automated
-```
+4. **[08-04-PersistentVolumes.md](08-Kubernetes-Workloads/08-04-PersistentVolumes.md)**
+   - Deep dive into Kubernetes storage
+   - Work with StorageClasses and PVCs
+   - Create volume snapshots
+   - ⏱️ 35-40 min
 
-### 3. Advanced Load Balancing
-
-```yaml
-ALB features:
-├── Path routing: /api → backend
-├── Host routing: api.domain.com → backend
-├── SSL termination
-├── Health checks
-└── Auto-scaling integration
-```
-
-### 4. Security Best Practices
-
-```yaml
-SSL/TLS:
-├── HTTPS only
-├── Certificate management
-├── Automatic renewal
-└── Industry standard
-```
+**Total Part A: ~2-2.5 hours**
 
 ---
 
-## 🆚 Comparison with Previous Activities
+### **Part B: Networking & Auto-Scaling**
 
-| Feature | Activity 3-4 | Activity 5 |
-|---------|-------------|-----------|
-| **Scaling** | Manual | Automatic |
-| **Load Balancer** | NodePort | ALB |
-| **SSL/TLS** | No | Yes |
-| **Production Ready** | No | Yes ✅ |
-| **Cost** | ~$3/day | ~$5-7/day |
-| **Complexity** | Basic | Advanced |
+**Production-ready networking and scaling:**
+
+1. **[01-Metrics-Server.md](01-Metrics-Server.md)**
+   - Install metrics server
+   - Monitor resource usage
+   - ⏱️ 20 min
+
+2. **[02-HPA-Setup.md](02-HPA-Setup.md)**
+   - Configure Horizontal Pod Autoscaler
+   - Auto-scale based on CPU/memory
+   - ⏱️ 30 min
+
+3. **[03-Cluster-Autoscaler.md](03-Cluster-Autoscaler.md)**
+   - Auto-scale cluster nodes
+   - Configure min/max nodes
+   - ⏱️ 40 min
+
+4. **[04-ALB-Controller.md](04-ALB-Controller.md)**
+   - Deploy AWS Load Balancer Controller
+   - Configure IAM permissions
+   - ⏱️ 40 min
+
+5. **[05-Ingress-SSL.md](05-Ingress-SSL.md)**
+   - Create Ingress resources
+   - Configure SSL with ACM
+   - ⏱️ 40 min
+
+6. **[06-Load-Testing.md](06-Load-Testing.md)**
+   - Test auto-scaling under load
+   - Monitor scaling behavior
+   - ⏱️ 30 min
+
+**Total Part B: ~3-3.5 hours**
 
 ---
 
-## ✅ Success Criteria
+### **Part C: CI/CD Pipeline**
 
-You've completed Activity 5 when:
+**Complete automated deployment pipeline:**
 
-- [ ] Metrics-server running
-- [ ] HPA configured for frontend and backend
-- [ ] Cluster Autoscaler deployed
-- [ ] ALB Controller installed
-- [ ] Application accessible via ALB
-- [ ] SSL/TLS configured (if using domain)
-- [ ] Auto-scaling tested and verified
-- [ ] **Everything deleted (including ALB!)**
+1. **[09-01-Jenkins-Setup.md](09-CI-CD-Pipeline/09-01-Jenkins-Setup.md)**
+   - Deploy Jenkins on Kubernetes
+   - Configure persistent storage
+   - Set up plugins and credentials
+   - ⏱️ 45-60 min
+
+2. **[09-02-ECR-Integration.md](09-CI-CD-Pipeline/09-02-ECR-Integration.md)**
+   - Create ECR repository
+   - Configure Jenkins with AWS
+   - Push Docker images to ECR
+   - ⏱️ 30-35 min
+
+3. **[09-03-Pipeline-Configuration.md](09-CI-CD-Pipeline/09-03-Pipeline-Configuration.md)**
+   - Create production-ready Jenkinsfile
+   - Configure Git webhooks
+   - Add testing and notifications
+   - ⏱️ 40-45 min
+
+4. **[09-04-Automated-Deployment.md](09-CI-CD-Pipeline/09-04-Automated-Deployment.md)**
+   - Implement GitOps workflow
+   - Configure deployment strategies
+   - Set up monitoring and rollback
+   - ⏱️ 35-40 min
+
+**Total Part C: ~3-4 hours**
+
+---
+
+## 🎓 What You'll Learn
+
+### Technical Skills
+
+**Kubernetes:**
+- Jobs, CronJobs, StatefulSets, DaemonSets
+- Secrets, ConfigMaps, Persistent Volumes
+- Horizontal and vertical scaling
+- Network policies and Ingress
+- Storage management
+
+**AWS:**
+- EKS advanced features
+- ECR (Elastic Container Registry)
+- ALB (Application Load Balancer)
+- ACM (Certificate Manager)
+- IAM for Kubernetes
+
+**CI/CD:**
+- Jenkins on Kubernetes
+- Docker image building
+- Automated testing
+- GitOps workflows
+- Deployment strategies (blue-green, canary)
+
+### Production Patterns
+
+```
+✅ Auto-scaling (pods and nodes)
+✅ Load balancing (Layer 7)
+✅ SSL/TLS termination
+✅ Persistent storage
+✅ Configuration management
+✅ Secrets management
+✅ Automated deployments
+✅ Rollback strategies
+✅ Monitoring and logging
+```
 
 ---
 
@@ -288,97 +336,148 @@ You've completed Activity 5 when:
 
 ### Before Starting
 
-1. **Budget:** This costs more (~$5-7/day)
-2. **Time:** Need 4-5 hours
-3. **Domain:** Optional but recommended for SSL
-4. **Previous Activities:** Should understand Activities 1-4
+- [ ] Budget alert configured
+- [ ] Time allocated (8-10 hours)
+- [ ] Tools installed (Activity 2)
+- [ ] Cluster ready or will create new one
 
 ### During Activity
 
-1. **Monitor costs:** ALB adds $0.54/day + data transfer
-2. **Test scaling:** Actually generate load to see it work
-3. **Understand concepts:** Don't just copy-paste
+- **Follow parts in order:** A → B → C
+- **Don't skip hands-on labs**
+- **Test everything as you go**
+- **Take notes on new concepts**
+
+### After Each Part
+
+- **Review what you learned**
+- **Can delete resources between parts** (to save costs)
+- **But easier to keep cluster running** for all 3 parts
 
 ### After Completion
 
-1. **Delete ALB first:** Before deleting cluster
-2. **Delete cluster:** `eksctl delete cluster`
-3. **Verify deletion:** Check AWS Console
-4. **Check billing:** Ensure no ongoing charges
+- **Delete cluster:** `eksctl delete cluster`
+- **Delete Load Balancers:** Check AWS Console
+- **Delete ECR repository:** If no longer needed
+- **Verify all resources deleted**
 
 ---
 
-## 🎓 What Makes This "Production-Ready"
+## ✅ Success Criteria
 
-### Reliability
+You've completed Activity 5 when:
 
+**Part A:**
+- [ ] Ran Jobs and CronJobs successfully
+- [ ] Used Secrets and ConfigMaps
+- [ ] Deployed MySQL with StatefulSet
+- [ ] Worked with Persistent Volumes
+
+**Part B:**
+- [ ] Metrics-server running
+- [ ] HPA scaling pods automatically
+- [ ] Cluster Autoscaler adding/removing nodes
+- [ ] ALB routing traffic with SSL
+
+**Part C:**
+- [ ] Jenkins deployed and accessible
+- [ ] Pipeline building and pushing to ECR
+- [ ] Automated deployments working
+- [ ] Git webhooks triggering builds
+
+**Overall:**
+- [ ] Understand all production patterns
+- [ ] Can troubleshoot issues
+- [ ] **Everything deleted to stop charges**
+
+---
+
+## 💰 Cost Management
+
+### Minimizing Costs
+
+```bash
+# Option 1: Complete all parts in one session (8-10 hours)
+# Keep cluster running throughout
+# Delete everything at end
+
+# Option 2: Split across days
+# Day 1: Parts A & B
+# Delete cluster at end of day
+# Day 2: Recreate cluster, do Part C
+# Delete everything at end
+
+# Option 3: Practice parts individually
+# Create cluster
+# Do one part
+# Delete cluster
+# Repeat for other parts
 ```
-✅ Auto-healing (pods restart)
-✅ Auto-scaling (handle traffic spikes)
-✅ Load balancing (distribute traffic)
-✅ Health checks (detect failures)
-✅ Multi-AZ (high availability)
-```
 
-### Performance
+### Monitoring Costs
 
-```
-✅ Scales with demand
-✅ Resource optimization
-✅ Efficient load distribution
-✅ Fast response times
-```
+```bash
+# Check running resources
+kubectl get all -A
+kubectl get pvc -A
 
-### Security
-
-```
-✅ HTTPS/SSL encryption
-✅ Certificate management
-✅ Security groups
-✅ IAM roles
-```
-
-### Operations
-
-```
-✅ Automated operations
-✅ Monitoring (metrics-server)
-✅ Logging (CloudWatch)
-✅ Infrastructure as Code
+# Check AWS resources
+aws ec2 describe-instances --filters "Name=tag:eks:cluster-name,Values=*"
+aws elbv2 describe-load-balancers
+aws ecr describe-repositories
 ```
 
 ---
 
-## 🚀 After This Activity
+## 🆘 Need Help?
 
-You'll be able to:
+### Common Issues
 
-- ✅ Deploy production-grade applications
-- ✅ Implement auto-scaling strategies
-- ✅ Configure load balancing
-- ✅ Manage SSL/TLS certificates
-- ✅ Handle traffic spikes automatically
-- ✅ Optimize costs with auto-scaling
-- ✅ Troubleshoot complex issues
+**Part A:**
+- Jobs stuck: Check pod logs and events
+- PVC not binding: Verify StorageClass exists
+- StatefulSet not starting: Check volume availability
 
-**Next Steps:**
-- Apply these patterns to your own applications
-- Explore service mesh (Istio, Linkerd)
-- Learn GitOps (ArgoCD, Flux)
-- Study monitoring (Prometheus, Grafana)
+**Part B:**
+- HPA not scaling: Verify metrics-server running
+- ALB not creating: Check IAM permissions
+- Ingress not working: Verify ALB Controller logs
+
+**Part C:**
+- Jenkins not starting: Check PVC status
+- Pipeline failing: Verify AWS credentials
+- Images not pushing: Check ECR permissions
+
+### Getting Support
+
+1. Check guide-specific troubleshooting sections
+2. Review pod logs: `kubectl logs`
+3. Check events: `kubectl get events`
+4. Review AWS CloudWatch logs
+5. Check EKS documentation
 
 ---
 
-## 📖 Resources
+## 🔗 Quick Links
 
-- [HPA Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
-- [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
-- [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
-- [EKS Best Practices](https://aws.github.io/aws-eks-best-practices/)
+- **Previous:** [../Activity4-Scripted-Setup/README.md](../Activity4-Scripted-Setup/README.md)
+- **Main README:** [../README.md](../README.md)
+- **Sample App:** [../sample-app/](../sample-app/)
 
 ---
 
-**Ready for production patterns?** Start with [01-Metrics-Server.md](01-Metrics-Server.md)!
+## 🎉 Ready to Begin?
 
-**Remember:** This is how real production clusters work! 🚀
+**Start with Part A:** [08-Kubernetes-Workloads/08-01-Jobs-And-CronJobs.md](08-Kubernetes-Workloads/08-01-Jobs-And-CronJobs.md)
+
+**Remember:**
+- Take your time
+- Hands-on practice is key
+- Test everything
+- Delete resources when done
+- Have fun learning! 🚀
+
+---
+
+**From basic Kubernetes to production-ready deployments - let's do this!** 💪
 
