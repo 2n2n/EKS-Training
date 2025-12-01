@@ -31,6 +31,7 @@ This is setup time - no AWS costs incurred!
 | 04 | AWS CLI Cheatsheet | Reference |
 | 05 | kubectl Cheatsheet | Reference |
 | 06 | eksctl Cheatsheet | Reference |
+| 07 | Docker Cheatsheet | Reference |
 
 **Note:** Setup time varies by operating system and internet speed.
 
@@ -96,6 +97,19 @@ eksctl get clusters
 
 **Why:** Easiest way to create EKS clusters
 
+### 4. Docker (Container Platform)
+
+**What:** Platform for building, running, and managing containers
+
+```bash
+# You'll use it for:
+docker build -t myapp:v1 .
+docker run -d -p 3000:3000 myapp:v1
+docker push ${ECR_REPO}:v1
+```
+
+**Why:** Package and deploy your applications as containers
+
 ---
 
 ## 📚 Installation Guides
@@ -135,6 +149,12 @@ eksctl get clusters
    - Cluster management
    - Node group operations
    - Configuration files
+
+7. **[07-Docker-Cheatsheet.md](07-Docker-Cheatsheet.md)** - Docker commands reference
+   - Image management
+   - Container operations
+   - AWS ECR integration
+   - Debugging and troubleshooting
 
 ---
 
@@ -382,6 +402,22 @@ You won't use it for:
 ❌ Deploying applications (use kubectl)
 ❌ Daily operations (use kubectl)
 ❌ After cluster is created (mostly kubectl)
+```
+
+### Docker - Container Platform
+
+```
+Use Docker when you need to:
+✅ Build application images
+✅ Run containers locally
+✅ Push images to registries (ECR, Docker Hub)
+✅ Test applications before deploying
+✅ Manage container lifecycle
+
+You won't use it for:
+❌ Orchestrating multiple containers (use Kubernetes)
+❌ Production container management (use Kubernetes)
+❌ Creating clusters (use eksctl)
 ```
 
 ---
