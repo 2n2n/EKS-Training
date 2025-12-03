@@ -134,6 +134,7 @@ Availability: If one node down = app still runs
 **Traditional:** Like your data center network
 
 **Why this matters:**
+
 - Isolation from other AWS customers
 - Control over IP addressing
 - Security boundaries
@@ -145,11 +146,13 @@ Availability: If one node down = app still runs
 **Traditional:** Like VLANs or network segments
 
 **Why 2 subnets:**
+
 - High availability (multi-AZ)
 - If one AZ fails, other continues
 - EKS requirement (minimum 2)
 
 **Why public:**
+
 - Direct internet access
 - No NAT Gateway needed (saves $32/month)
 - Good for learning/development
@@ -157,9 +160,10 @@ Availability: If one node down = app still runs
 ### 3. Internet Gateway
 
 **What:** Allows VPC resources to access internet  
-**Traditional:** Like your router's WAN connection  
+**Traditional:** Like your router's WAN connection
 
 **Why this matters:**
+
 - Nodes need to pull container images
 - Nodes need to register with EKS
 - You need to access your app
@@ -167,10 +171,12 @@ Availability: If one node down = app still runs
 ### 4. Security Groups
 
 **Control Plane SG:**
+
 - Inbound: Port 443 (HTTPS) from anywhere
 - Purpose: kubectl access to API server
 
 **Node SG:**
+
 - Inbound: All from Control Plane SG
 - Inbound: Ports 30000-32767 from anywhere (NodePort range)
 - Inbound: All from same SG (pod-to-pod)
@@ -181,14 +187,16 @@ Availability: If one node down = app still runs
 ### 5. IAM Roles
 
 **Cluster Role:**
+
 - Who: EKS Control Plane
 - Can do: Manage AWS resources (LB, ENI, SG)
 - Policy: AmazonEKSClusterPolicy
 
 **Node Role:**
+
 - Who: Worker Nodes (EC2 instances)
 - Can do: Pull images, attach volumes, send logs
-- Policies: 
+- Policies:
   - AmazonEKSWorkerNodePolicy
   - AmazonEKS_CNI_Policy
   - AmazonEC2ContainerRegistryReadOnly
@@ -202,6 +210,7 @@ Availability: If one node down = app still runs
 **Cost:** $0.10/hour = $72/month (non-negotiable)
 
 **Components:**
+
 - API Server: Handles kubectl commands
 - Scheduler: Decides which node runs which pod
 - Controller Manager: Maintains desired state
@@ -218,6 +227,7 @@ Availability: If one node down = app still runs
 **Cost:** ~$0.025/hour = ~$18/month for both
 
 **What they run:**
+
 - kubelet (Kubernetes agent)
 - Container runtime (Docker/containerd)
 - Your application pods
@@ -235,6 +245,7 @@ Availability: If one node down = app still runs
 **Access:** http://node-public-ip:30080
 
 **Why monolith here:**
+
 - Simpler to understand
 - One container to deploy
 - Good starting point
@@ -470,16 +481,19 @@ Application:
 Through this manual setup, you learn:
 
 1. **VPC Networking**
+
    - How AWS networking works
    - Public vs private subnets
    - Internet connectivity
 
 2. **IAM Security**
+
    - Role-based access
    - Service permissions
    - Principle of least privilege
 
 3. **EKS Architecture**
+
    - Control plane vs data plane
    - How components communicate
    - Kubernetes in AWS
@@ -490,6 +504,7 @@ Through this manual setup, you learn:
    - Troubleshooting approaches
 
 **This knowledge helps you:**
+
 - Troubleshoot issues
 - Understand eksctl automation
 - Design production architectures
@@ -509,9 +524,8 @@ After understanding this architecture:
 
 ---
 
-**Ready to build it?** Start with [01-VPC-Setup.md](01-VPC-Setup.md)!
+**Ready to build it?** Start with [COMPLETE-SETUP-GUIDE.md](COMPLETE-SETUP-GUIDE.md)!
 
 **Questions about architecture?** Review the component descriptions above.
 
 **Want to see automation?** Complete this activity first, then Activity 4 shows how eksctl does this in one command!
-

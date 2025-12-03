@@ -1,7 +1,9 @@
+
 -- MySQL dump 10.13  Distrib 8.0.0, for Linux (x86_64)
 --
 -- Host: localhost    Database: testdb
--- ------------------------------------------------------
+CREATE DATABASE IF NOT EXISTS testdb;
+USE testdb;
 -- Server version	8.0.0
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;

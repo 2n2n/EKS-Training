@@ -93,13 +93,13 @@ Activity 5: Advanced Setup (8-10 hours)
 
 ### Activity Costs
 
-| Activity | AWS Resources | Daily Cost | Monthly (if left) |
-|----------|--------------|------------|-------------------|
-| Activity 1 | None | $0 | $0 |
-| Activity 2 | None | $0 | $0 |
-| Activity 3 | EKS + 2 nodes | ~$3/day | ~$90/month |
-| Activity 4 | EKS + 2 nodes | ~$3/day | ~$90/month |
-| Activity 5 | EKS + nodes + ALB | ~$5-7/day | ~$150-210/month |
+| Activity   | AWS Resources     | Daily Cost | Monthly (if left) |
+| ---------- | ----------------- | ---------- | ----------------- |
+| Activity 1 | None              | $0         | $0                |
+| Activity 2 | None              | $0         | $0                |
+| Activity 3 | EKS + 2 nodes     | ~$3/day    | ~$90/month        |
+| Activity 4 | EKS + 2 nodes     | ~$3/day    | ~$90/month        |
+| Activity 5 | EKS + nodes + ALB | ~$5-7/day  | ~$150-210/month   |
 
 ### Cost Breakdown
 
@@ -120,7 +120,7 @@ With ALB: ~$110/month
 ✅ **Public subnets only** - No NAT Gateway ($32/month saved)  
 ✅ **Short log retention** - Minimal CloudWatch costs  
 ✅ **Small instances** - t3.medium suitable for learning  
-✅ **Delete when done** - Only pay for active time  
+✅ **Delete when done** - Only pay for active time
 
 ⚠️ **IMPORTANT:** Always delete resources after each activity!
 
@@ -243,26 +243,31 @@ EKS-Training/
 ### For First-Time Learners
 
 **Day 1: Theory (3-4 hours)**
+
 1. Read Activity 1 - Prerequisites
 2. Understand why Kubernetes exists
 3. Learn core concepts
 
 **Day 2: Setup (30 min)**
+
 1. Complete Activity 2 - Tools installation
 2. Verify all tools work
 3. Review cheatsheets
 
 **Day 3: Hands-On Console (3-4 hours)**
+
 1. Complete Activity 3 - Console Setup
 2. Create cluster manually
 3. **Delete everything when done**
 
 **Day 4: Automation (2-2.5 hours)**
+
 1. Complete Activity 4 - Scripted Setup
 2. See automation benefits
 3. **Delete cluster when done**
 
 **Days 5-6: Production Patterns (8-10 hours)**
+
 1. Complete Activity 5 - Advanced Setup
    - Part A: Kubernetes Workloads (2-2.5 hours)
    - Part B: Networking & Scaling (3-3.5 hours)
@@ -273,6 +278,7 @@ EKS-Training/
 ### For Experienced Users
 
 **Fast Track (8-12 hours total):**
+
 1. Skim Activity 1 (review concepts)
 2. Install tools (Activity 2)
 3. **Skip Activity 3** or just read it
@@ -336,19 +342,19 @@ Each guide includes:
 
 ```markdown
 🏢 Traditional Way:
-   How you'd do this with VPS/servers
+How you'd do this with VPS/servers
 
 ☁️ AWS Way:
-   How we do it in the cloud
+How we do it in the cloud
 
 💡 Why It Matters:
-   Benefits and trade-offs
+Benefits and trade-offs
 
 ⚠️ Watch Out:
-   Common mistakes to avoid
+Common mistakes to avoid
 
 ✅ Success Criteria:
-   How to verify it worked
+How to verify it worked
 ```
 
 ### Following Activities
@@ -362,6 +368,7 @@ Each guide includes:
 ### Using Cheatsheets
 
 Keep these open in browser tabs:
+
 - Activity 2: AWS CLI Cheatsheet
 - Activity 2: kubectl Cheatsheet
 - Activity 2: eksctl Cheatsheet
@@ -441,16 +448,19 @@ Keep these open in browser tabs:
 Each activity has detailed troubleshooting sections. Common issues:
 
 **Can't create cluster:**
+
 - Check IAM permissions
 - Verify AWS CLI configuration
 - Check service quotas
 
 **Nodes not joining:**
+
 - Verify security group rules
 - Check IAM node role
 - Review CloudWatch logs
 
 **Application not accessible:**
+
 - Check service type (NodePort)
 - Verify security group allows traffic
 - Check pod logs
@@ -499,7 +509,7 @@ You've successfully completed the training when you can:
 ✅ Build CI/CD pipelines with Jenkins  
 ✅ Automate deployments from Git to Kubernetes  
 ✅ Understand cost implications  
-✅ Know when NOT to use Kubernetes  
+✅ Know when NOT to use Kubernetes
 
 ---
 
@@ -570,6 +580,7 @@ This training material is provided for educational purposes. Feel free to:
 👉 **Begin with:** [Activity1-Prerequisites/README.md](Activity1-Prerequisites/README.md)
 
 **Remember:**
+
 - Take your time
 - Understand before moving forward
 - Delete resources after each activity
@@ -579,3 +590,4 @@ This training material is provided for educational purposes. Feel free to:
 
 **From traditional servers to cloud-native Kubernetes - You've got this!** 🚀
 
+hello world!
