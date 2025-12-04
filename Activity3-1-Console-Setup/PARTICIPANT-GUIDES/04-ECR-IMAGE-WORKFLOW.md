@@ -16,6 +16,7 @@ Learn how to build Docker images, push them to the shared ECR repository, and us
 - Push images to the shared ECR repository
 - Pull and verify images
 - Use ECR images in Kubernetes deployments
+- **Access your app via IP address and NodePort**
 
 ---
 
@@ -52,6 +53,26 @@ Examples:
 ❌ webapp (no username!)
 ❌ v1 (no app name!)
 ```
+
+---
+
+## 🔢 NodePort Assignments (IMPORTANT!)
+
+Each participant **MUST use a unique NodePort** to avoid conflicts. NodePorts are how you access your app via IP address.
+
+| Participant   | NodePort | Access URL               |
+| ------------- | -------- | ------------------------ |
+| Participant 1 | 30081    | `http://<node-ip>:30081` |
+| Participant 2 | 30082    | `http://<node-ip>:30082` |
+| Participant 3 | 30083    | `http://<node-ip>:30083` |
+| Participant 4 | 30084    | `http://<node-ip>:30084` |
+| Participant 5 | 30085    | `http://<node-ip>:30085` |
+| Participant 6 | 30086    | `http://<node-ip>:30086` |
+| Participant 7 | 30087    | `http://<node-ip>:30087` |
+
+⚠️ **Use YOUR assigned NodePort in your deployment YAML!**
+
+Valid NodePort range: `30000-32767`
 
 ---
 
@@ -165,13 +186,15 @@ CMD ["nginx", "-g", "daemon off;"]
 `<username>-<appname>:<version>`
 
 ```bash
-
 # Build with local tag first
-docker build -t eks-thon-todo:v1 .
+# ⚠️ IMPORTANT: Use --platform=linux/amd64 if you're on Apple Silicon Mac!
+docker build --platform=linux/amd64 -t <your-name>-webapp:v1 .
 
 # Verify image was created
-docker images | grep eks-thon-todo
+docker images | grep <your-name>-webapp
 ```
+
+> 💡 **Apple Silicon Users (M1/M2/M3 Mac):** Always include `--platform=linux/amd64` when building, otherwise your image won't run on EKS nodes!
 
 **Expected output:**
 
@@ -288,29 +311,29 @@ docker pull $ECR_URI:joshua-webapp-v1
 ### Create Deployment Using Your Image
 
 ```yaml
-# Save as charles-deployment.yaml
+# Save as <your-name>-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: charles-webapp
-  namespace: charles-workspace
+  name: <your-name>-webapp
+  namespace: <your-name>-workspace
   labels:
-    app: charles-webapp
-    owner: charles
+    app: <your-name>-webapp
+    owner: <your-name>
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: charles-webapp
+      app: <your-name>-webapp
   template:
     metadata:
       labels:
-        app: charles-webapp
-        owner: charles
+        app: <your-name>-webapp
+        owner: <your-name>
     spec:
       containers:
         - name: webapp
-          image: <account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps:charles-webapp-v1
+          image: <account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps:<your-name>-webapp-v1
           ports:
             - containerPort: 80
           resources:
@@ -324,19 +347,23 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: charles-webapp-svc
-  namespace: charles-workspace
+  name: <your-name>-webapp-svc
+  namespace: <your-name>-workspace
 spec:
   type: NodePort
   selector:
-    app: charles-webapp
+    app: <your-name>-webapp
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30081
+      nodePort: <YOUR-ASSIGNED-NODEPORT> # ⚠️ USE YOUR UNIQUE PORT FROM TABLE ABOVE!
 ```
 
-**Replace `<account-id>` with actual account ID!**
+**⚠️ Replace these placeholders:**
+
+- `<account-id>` → Your AWS account ID (e.g., `078288879769`)
+- `<your-name>` → Your participant name (e.g., `charles`)
+- `<YOUR-ASSIGNED-NODEPORT>` → Your unique port from the NodePort Assignments table (e.g., `30081`)
 
 ### Deploy to Kubernetes
 
@@ -355,12 +382,107 @@ kubectl get deployment charles-webapp -n charles-workspace
 
 ```bash
 # Describe pod to see image
-kubectl describe pod -l app=charles-webapp -n charles-workspace | grep Image
+kubectl describe pod -l app=<your-name>-webapp -n <your-name>-workspace | grep Image
 ```
 
 ---
 
-## Step 8: Update Image (Push New Version)
+## Step 8: Access Your App via IP Address 🌐
+
+Once your pods are running, you can access your application via any worker node's IP address.
+
+### Get Node External IP Addresses
+
+```bash
+# List all nodes with their IPs
+kubectl get nodes -o wide
+
+# Output shows EXTERNAL-IP column - use any of these IPs
+```
+
+**Example output:**
+
+```
+NAME                                            STATUS   ROLES    EXTERNAL-IP
+ip-10-0-1-114.ap-southeast-1.compute.internal   Ready    <none>   47.129.170.219
+ip-10-0-1-116.ap-southeast-1.compute.internal   Ready    <none>   13.212.116.22
+ip-10-0-2-207.ap-southeast-1.compute.internal   Ready    <none>   3.0.96.212
+```
+
+### Access Your Application
+
+Open your browser and go to:
+
+```
+http://<any-node-external-ip>:<your-nodeport>
+```
+
+**Examples:**
+
+| Participant                | URL                           |
+| -------------------------- | ----------------------------- |
+| Participant 1 (port 30081) | `http://47.129.170.219:30081` |
+| Participant 2 (port 30082) | `http://47.129.170.219:30082` |
+| Participant 5 (port 30085) | `http://47.129.170.219:30085` |
+
+### Verify Service is Exposed
+
+```bash
+# Check your service
+kubectl get svc -n <your-name>-workspace
+
+# Should show NodePort with your assigned port
+NAME                  TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+<your-name>-webapp-svc   NodePort   172.20.x.x      <none>        80:30081/TCP   5m
+```
+
+### Test with curl
+
+```bash
+# Test from terminal
+curl http://<node-external-ip>:<your-nodeport>
+
+# Example
+curl http://47.129.170.219:30081
+```
+
+### ⚠️ Can't Connect? Check Security Group
+
+If you can't access your app, the security group may not allow traffic on your NodePort.
+
+**For Workshop Admin:** Run this command to open a NodePort:
+
+```bash
+# Find the EKS cluster security group
+aws ec2 describe-security-groups \
+    --region ap-southeast-1 \
+    --filters "Name=tag:aws:eks:cluster-name,Values=*" \
+    --query 'SecurityGroups[*].[GroupId,GroupName]' \
+    --output table
+
+# Add inbound rule for NodePort (replace sg-xxx and port)
+aws ec2 authorize-security-group-ingress \
+    --region ap-southeast-1 \
+    --group-id sg-0540cfa3427d1ea12 \
+    --protocol tcp \
+    --port 30081 \
+    --cidr 0.0.0.0/0
+```
+
+**To open all workshop NodePorts at once (30081-30087):**
+
+```bash
+aws ec2 authorize-security-group-ingress \
+    --region ap-southeast-1 \
+    --group-id sg-0540cfa3427d1ea12 \
+    --protocol tcp \
+    --port 30081-30087 \
+    --cidr 0.0.0.0/0
+```
+
+---
+
+## Step 9: Update Image (Push New Version)
 
 ### Update Your Application
 
@@ -375,30 +497,40 @@ sed -i 's/Version: v1/Version: v2/' index.html
 
 ```bash
 # Build new version
-docker build -t charles-webapp:v2 .
+docker build -t <your-name>-webapp:v2 .
 
 # Tag for ECR
-docker tag charles-webapp:v2 $ECR_URI:charles-webapp-v2
+docker tag <your-name>-webapp:v2 $ECR_URI:<your-name>-webapp-v2
 
 # Push
-docker push $ECR_URI:charles-webapp-v2
+docker push $ECR_URI:<your-name>-webapp-v2
 ```
 
 ### Update Kubernetes Deployment
 
 ```bash
 # Update image in deployment
-kubectl set image deployment/charles-webapp \
-    webapp=$ECR_URI:charles-webapp-v2 \
-    -n charles-workspace
+kubectl set image deployment/<your-name>-webapp \
+    webapp=$ECR_URI:<your-name>-webapp-v2 \
+    -n <your-name>-workspace
 
 # Watch rollout
-kubectl rollout status deployment/charles-webapp -n charles-workspace
+kubectl rollout status deployment/<your-name>-webapp -n <your-name>-workspace
 ```
+
+### Verify Update in Browser
+
+After the rollout completes, refresh your browser at:
+
+```
+http://<node-external-ip>:<your-nodeport>
+```
+
+You should see Version: v2!
 
 ---
 
-## Step 9: List and Manage Images
+## Step 10: List and Manage Images
 
 ### List All Images
 
@@ -495,6 +627,62 @@ kubectl describe pod <pod-name> -n <namespace> | grep Image
 
 ---
 
+### Issue: "exec format error" / CrashLoopBackOff
+
+**Error in pod logs:**
+
+```
+exec /usr/local/bin/docker-entrypoint.sh: exec format error
+```
+
+**Cause:** You built the Docker image on an Apple Silicon Mac (ARM) but EKS nodes run AMD64/x86_64.
+
+**Solution:** Rebuild with the correct platform:
+
+```bash
+# Rebuild with AMD64 platform (required for EKS!)
+docker build --platform=linux/amd64 -t <your-name>-webapp:v1 .
+
+# Or add to Dockerfile:
+FROM --platform=linux/amd64 node:18-alpine
+
+# Re-tag and push
+docker tag <your-name>-webapp:v1 $ECR_URI:<your-name>-webapp-v1
+docker push $ECR_URI:<your-name>-webapp-v1
+
+# Restart deployment to pull new image
+kubectl rollout restart deployment/<your-name>-webapp -n <your-name>-workspace
+```
+
+---
+
+### Issue: Can't access app via IP (connection timeout)
+
+**Cause:** Security group doesn't allow traffic on your NodePort.
+
+**Solution (Admin only):**
+
+```bash
+# Open your NodePort in the security group
+aws ec2 authorize-security-group-ingress \
+    --region ap-southeast-1 \
+    --group-id sg-0540cfa3427d1ea12 \
+    --protocol tcp \
+    --port <your-nodeport> \
+    --cidr 0.0.0.0/0
+```
+
+**Verify security group rule exists:**
+
+```bash
+aws ec2 describe-security-groups \
+    --group-ids sg-0540cfa3427d1ea12 \
+    --region ap-southeast-1 \
+    --query 'SecurityGroups[0].IpPermissions[?FromPort==`30081`]'
+```
+
+---
+
 ## ✅ Validation Checklist
 
 - [ ] Authenticated Docker with ECR
@@ -504,6 +692,7 @@ kubectl describe pod <pod-name> -n <namespace> | grep Image
 - [ ] Verified image in ECR console
 - [ ] Deployed using ECR image in Kubernetes
 - [ ] Pods successfully pulled and ran the image
+- [ ] **Accessed app via IP address and NodePort in browser**
 
 ---
 
@@ -514,8 +703,8 @@ kubectl describe pod <pod-name> -n <namespace> | grep Image
 aws ecr get-login-password --region ap-southeast-1 | \
     docker login --username AWS --password-stdin <account-id>.dkr.ecr.ap-southeast-1.amazonaws.com
 
-# BUILD
-docker build -t <your-name>-<app>:<version> .
+# BUILD (for EKS - specify linux/amd64 platform!)
+docker build --platform=linux/amd64 -t <your-name>-<app>:<version> .
 
 # TAG
 docker tag <local-image> <ecr-uri>:<your-name>-<app>-<version>
@@ -534,6 +723,12 @@ aws ecr describe-images --repository-name eks-workshop-apps --image-ids imageTag
 
 # DELETE image (only yours!)
 aws ecr batch-delete-image --repository-name eks-workshop-apps --image-ids imageTag=<your-tag> --region ap-southeast-1
+
+# GET NODE IPs (for accessing via browser)
+kubectl get nodes -o wide
+
+# ACCESS YOUR APP
+# http://<node-external-ip>:<your-nodeport>
 ```
 
 ---
@@ -546,6 +741,8 @@ aws ecr batch-delete-image --repository-name eks-workshop-apps --image-ids image
 - ✅ How to push/pull images from ECR
 - ✅ How to use ECR images in Kubernetes
 - ✅ How to update deployments with new images
+- ✅ **How to access your app via IP address and NodePort**
+- ✅ **How to configure security groups for external access**
 
 ---
 
