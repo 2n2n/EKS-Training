@@ -23,6 +23,7 @@ Learn how to create, scale, and manage worker nodes in the shared EKS cluster.
 Node groups affect **everyone** in the shared cluster!
 
 **Before creating/deleting node groups:**
+
 - 📢 Announce in team chat
 - ✅ Wait for acknowledgment
 - 🧮 Check cluster capacity first
@@ -47,6 +48,7 @@ EKS Cluster
 ```
 
 **Each node (EC2 instance):**
+
 - Runs your pods/containers
 - Has CPU, memory, storage
 - Can run pods from ANY namespace
@@ -62,6 +64,7 @@ kubectl get nodes
 ```
 
 **Expected output:**
+
 ```
 NAME                                          STATUS   ROLES    AGE   VERSION
 ip-10-0-1-123.ap-southeast-1.compute.internal Ready    <none>   2h    v1.28.x
@@ -89,6 +92,7 @@ kubectl top nodes
 ```
 
 **Example capacity per node (t3.medium):**
+
 ```
 Allocatable:
   cpu:     1930m (~1.9 vCPU)
@@ -134,8 +138,6 @@ aws eks describe-nodegroup \
 
 ## Step 3: Create Your Own Node Group (Activity!)
 
-⚠️ **ANNOUNCE IN TEAM CHAT FIRST!**
-
 Message: "Creating node group charles-nodes (1 node). Will delete after testing."
 
 ### Via AWS Console
@@ -144,12 +146,14 @@ Message: "Creating node group charles-nodes (1 node). Will delete after testing.
 2. Click **Compute** tab → **Add node group**
 
 **Step 1 - Configure node group:**
+
 ```
 Name: charles-nodes  (use YOUR name!)
 Node IAM role: eks-workshop-node-role
 ```
 
 **Step 2 - Compute configuration:**
+
 ```
 AMI type: Amazon Linux 2
 Capacity type: Spot (saves money!)
@@ -163,6 +167,7 @@ Scaling:
 ```
 
 **Step 3 - Networking:**
+
 ```
 Subnets: Select BOTH public subnets
 Remote access: Not now
@@ -374,6 +379,7 @@ aws eks delete-nodegroup \
 ## 💰 Cost Awareness
 
 **Node Group Costs:**
+
 ```
 t3.medium Spot: ~$0.0125/hour (~$9/month)
 t3.medium On-Demand: ~$0.0416/hour (~$30/month)
@@ -383,6 +389,7 @@ Running 4 hours: ~$0.05
 ```
 
 **Always:**
+
 - Use Spot instances for testing
 - Scale to 0 or delete when done
 - Don't leave nodes running overnight
@@ -459,4 +466,3 @@ Now let's work with container images!
 - [Amazon EKS Managed Node Groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)
 - [Node Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 - [Node Affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
-
