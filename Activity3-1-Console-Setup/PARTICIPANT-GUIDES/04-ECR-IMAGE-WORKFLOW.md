@@ -335,7 +335,7 @@ spec:
         - name: webapp
           image: <account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps:<your-name>-webapp-v1
           ports:
-            - containerPort: 80
+            - containerPort: 3000
           resources:
             requests:
               cpu: 100m
@@ -354,8 +354,8 @@ spec:
   selector:
     app: <your-name>-webapp
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 3000
+      targetPort: 3000
       nodePort: <YOUR-ASSIGNED-NODEPORT> # ⚠️ USE YOUR UNIQUE PORT FROM TABLE ABOVE!
 ```
 
