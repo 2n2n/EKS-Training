@@ -29,13 +29,13 @@ You have **full admin access** to a shared cluster. Your actions affect 6 other 
 
 The workshop admin will provide you with:
 
-| Information | Example | Your Value |
-|-------------|---------|------------|
-| IAM Username | `eks-charles` | __________ |
-| Access Key ID | `AKIA...` | __________ |
-| Secret Access Key | `wJalr...` | __________ |
-| AWS Region | `ap-southeast-1` | __________ |
-| Cluster Name | `shared-workshop-cluster` | __________ |
+| Information       | Example                   | Your Value   |
+| ----------------- | ------------------------- | ------------ |
+| IAM Username      | `eks-charles`             | ****\_\_**** |
+| Access Key ID     | `AKIA...`                 | ****\_\_**** |
+| Secret Access Key | `wJalr...`                | ****\_\_**** |
+| AWS Region        | `ap-southeast-1`          | ****\_\_**** |
+| Cluster Name      | `shared-workshop-cluster` | ****\_\_**** |
 
 **Keep these credentials safe!** Don't share them publicly.
 
@@ -66,11 +66,12 @@ aws sts get-caller-identity
 ```
 
 **Expected output:**
+
 ```json
 {
-    "UserId": "AIDAXXXXXXXXXXXXXXXXX",
-    "Account": "123456789012",
-    "Arn": "arn:aws:iam::123456789012:user/eks-charles"
+  "UserId": "AIDAXXXXXXXXXXXXXXXXX",
+  "Account": "123456789012",
+  "Arn": "arn:aws:iam::123456789012:user/eks-charles"
 }
 ```
 
@@ -89,6 +90,7 @@ aws eks update-kubeconfig \
 ```
 
 **Expected output:**
+
 ```
 Added new context arn:aws:eks:ap-southeast-1:123456789012:cluster/shared-workshop-cluster to /Users/yourname/.kube/config
 ```
@@ -111,6 +113,7 @@ kubectl get nodes
 ```
 
 **Expected output (2 nodes):**
+
 ```
 NAME                                          STATUS   ROLES    AGE   VERSION
 ip-10-0-1-123.ap-southeast-1.compute.internal Ready    <none>   1h    v1.28.x
@@ -126,6 +129,7 @@ kubectl get namespaces
 ```
 
 **Expected output:**
+
 ```
 NAME              STATUS   AGE
 default           Active   1h
@@ -199,6 +203,7 @@ kubectl create namespace charles-workspace
 ```
 
 **Expected output:**
+
 ```
 namespace/charles-workspace created
 ```
@@ -212,8 +217,15 @@ kubectl config set-context --current --namespace=charles-workspace
 **Now all your kubectl commands will use your namespace by default!**
 
 Verify:
+
 ```bash
 kubectl config view --minify | grep namespace
+```
+
+for windows:
+
+```bash
+kubectl config view --minify | findstr "namespace"
 ```
 
 ---
@@ -235,11 +247,13 @@ Before proceeding, confirm:
 ### Issue: "Unable to locate credentials"
 
 **Error:**
+
 ```
 Unable to locate credentials. You can configure credentials by running "aws configure".
 ```
 
 **Solution:**
+
 ```bash
 # Re-run aws configure
 aws configure
@@ -253,11 +267,13 @@ cat ~/.aws/credentials
 ### Issue: "Unable to connect to the server"
 
 **Error:**
+
 ```
 Unable to connect to the server: dial tcp: lookup xxxxx on 8.8.8.8:53: no such host
 ```
 
 **Solution:**
+
 ```bash
 # Check your internet connection
 ping google.com
@@ -276,11 +292,13 @@ aws eks describe-cluster --name shared-workshop-cluster --region ap-southeast-1
 ### Issue: "Unauthorized" Error
 
 **Error:**
+
 ```
 error: You must be logged in to the server (Unauthorized)
 ```
 
 **Solution:**
+
 ```bash
 # Verify you're using correct credentials
 aws sts get-caller-identity
@@ -301,6 +319,7 @@ aws eks update-kubeconfig --name shared-workshop-cluster --region ap-southeast-1
 **Cause:** Cluster has no worker nodes yet.
 
 **Solution:**
+
 - Wait - admin may still be setting up
 - Or, you'll create nodes in a later activity!
 
@@ -359,4 +378,3 @@ You're connected! Now create your workspace:
 - [AWS CLI Configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 - [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 - [EKS User Guide](https://docs.aws.amazon.com/eks/latest/userguide/)
-
