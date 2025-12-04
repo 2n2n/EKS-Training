@@ -22,11 +22,13 @@ Learn how to build Docker images, push them to the shared ECR repository, and us
 ## Understanding ECR
 
 **What is Amazon ECR?**
+
 - Elastic Container Registry = AWS Docker image storage
 - Like Docker Hub, but private and AWS-integrated
 - Stores your application container images
 
 **Shared Repository Setup:**
+
 ```
 ECR Repository: eks-workshop-apps
 │
@@ -38,6 +40,7 @@ ECR Repository: eks-workshop-apps
 ```
 
 **Tagging Convention:**
+
 ```
 Format: <your-name>-<app-name>-<version>
 
@@ -57,6 +60,7 @@ Examples:
 ### From Workshop Admin
 
 The admin will provide:
+
 ```
 Repository Name: eks-workshop-apps
 Region: ap-southeast-1
@@ -93,6 +97,7 @@ aws ecr get-login-password --region ap-southeast-1 | \
 ```
 
 **Expected output:**
+
 ```
 Login Succeeded
 ```
@@ -119,25 +124,33 @@ cd ~/my-workshop-app
 ### Create Application Files
 
 **Create index.html:**
+
 ```html
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Hello from Charles!</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 50px; }
-        h1 { color: #2196F3; }
+      body {
+        font-family: Arial;
+        text-align: center;
+        padding: 50px;
+      }
+      h1 {
+        color: #2196f3;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Hello from Charles's App!</h1>
     <p>Running on Kubernetes in EKS</p>
     <p>Version: v1</p>
-</body>
+  </body>
 </html>
 ```
 
 **Create Dockerfile:**
+
 ```dockerfile
 FROM nginx:alpine
 COPY index.html /usr/share/nginx/html/index.html
@@ -147,15 +160,21 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ### Build the Image
 
+#### Example format
+
+`<username>-<appname>:<version>`
+
 ```bash
+
 # Build with local tag first
-docker build -t charles-webapp:v1 .
+docker build -t eks-thon-todo:v1 .
 
 # Verify image was created
-docker images | grep charles-webapp
+docker images | grep eks-thon-todo
 ```
 
 **Expected output:**
+
 ```
 charles-webapp   v1   abc123def   5 seconds ago   23MB
 ```
@@ -192,6 +211,7 @@ docker images | grep charles-webapp
 ```
 
 **You should see two entries:**
+
 ```
 charles-webapp                v1            abc123def
 <ecr-uri>/eks-workshop-apps   charles-webapp-v1   abc123def
@@ -209,6 +229,7 @@ docker push $ECR_URI:charles-webapp-v1
 ```
 
 **Expected output:**
+
 ```
 The push refers to repository [<account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps]
 abc123: Pushed
@@ -288,17 +309,17 @@ spec:
         owner: charles
     spec:
       containers:
-      - name: webapp
-        image: <account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps:charles-webapp-v1
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 200m
-            memory: 256Mi
+        - name: webapp
+          image: <account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps:charles-webapp-v1
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
 ---
 apiVersion: v1
 kind: Service
@@ -310,9 +331,9 @@ spec:
   selector:
     app: charles-webapp
   ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 30081
+    - port: 80
+      targetPort: 80
+      nodePort: 30081
 ```
 
 **Replace `<account-id>` with actual account ID!**
@@ -418,11 +439,13 @@ aws ecr batch-delete-image \
 ### Issue: "no basic auth credentials"
 
 **Error:**
+
 ```
 Error response from daemon: no basic auth credentials
 ```
 
 **Solution:**
+
 ```bash
 # Re-authenticate
 aws ecr get-login-password --region ap-southeast-1 | \
@@ -435,11 +458,13 @@ aws ecr get-login-password --region ap-southeast-1 | \
 ### Issue: "denied: User is not authorized"
 
 **Error:**
+
 ```
 denied: User: arn:aws:iam::xxx:user/eks-charles is not authorized
 ```
 
 **Solution:**
+
 - Check with workshop admin
 - Verify your IAM user has ECR permissions
 - Try re-authenticating
@@ -449,12 +474,14 @@ denied: User: arn:aws:iam::xxx:user/eks-charles is not authorized
 ### Issue: "ImagePullBackOff" in Kubernetes
 
 **Error in pod:**
+
 ```
 Events:
   Failed to pull image "xxx": rpc error: ImagePullBackOff
 ```
 
 **Solutions:**
+
 ```bash
 # 1. Verify image exists
 aws ecr list-images --repository-name eks-workshop-apps --region ap-southeast-1
@@ -535,4 +562,3 @@ Now let's deploy a complete application!
 - [Amazon ECR User Guide](https://docs.aws.amazon.com/AmazonECR/latest/userguide/)
 - [Docker Build Documentation](https://docs.docker.com/engine/reference/commandline/build/)
 - [Kubernetes Container Images](https://kubernetes.io/docs/concepts/containers/images/)
-
