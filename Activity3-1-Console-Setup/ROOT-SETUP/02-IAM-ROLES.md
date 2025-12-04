@@ -492,6 +492,11 @@ IAM roles created! Continue to:
 
 **Next:** [03-EKS-CLUSTER-CREATION.md](03-EKS-CLUSTER-CREATION.md) - Create the EKS cluster
 
+**Important:** After cluster creation, you'll need to grant participant access. Modern EKS clusters use **Access Entries** instead of ConfigMap. See:
+
+- [06-EKS-ACCESS-ENTRIES-TROUBLESHOOTING.md](06-EKS-ACCESS-ENTRIES-TROUBLESHOOTING.md) - For API authentication mode
+- [05-PARTICIPANT-ACCESS.md](05-PARTICIPANT-ACCESS.md) - For ConfigMap authentication mode (legacy)
+
 ---
 
 ## Quick Command Reference

@@ -41,6 +41,7 @@ RBAC (Kubernetes Level):
 ```
 
 **aws-auth ConfigMap:**
+
 - Maps IAM identities to Kubernetes roles
 - Required for anyone except cluster creator
 - Lives in kube-system namespace
@@ -72,6 +73,7 @@ done
 ```
 
 **Save these ARNs!** Format:
+
 ```
 arn:aws:iam::<account-id>:user/eks-charles
 arn:aws:iam::<account-id>:user/eks-joshua
@@ -97,6 +99,7 @@ kubectl get configmap aws-auth -n kube-system -o yaml > aws-auth-backup.yaml
 ```
 
 **Current content** (approximately):
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -113,6 +116,7 @@ data:
 ```
 
 **What this does:**
+
 - Maps node IAM role to Kubernetes system:node
 - Allows nodes to join cluster
 - **Don't modify this part!**
@@ -292,12 +296,14 @@ rm ~/.aws/credentials # Be careful! Or manually edit
 ## ⚠️ Understanding system:masters Group
 
 **What is system:masters?**
+
 - Built-in Kubernetes admin group
 - Has FULL cluster access
 - Can do ANYTHING in the cluster
 - Bypasses all authorization checks
 
 **Permissions granted:**
+
 ```
 With system:masters, participants CAN:
 ✅ Create/delete any resources
@@ -313,6 +319,7 @@ Participants CANNOT (AWS-level restrictions):
 ```
 
 **Why give this level of access?**
+
 - Learning environment (not production)
 - Participants need hands-on experience
 - Teaches responsibility
@@ -360,6 +367,7 @@ kubectl apply -f namespace-admin-role.yaml
 **Then in aws-auth, map to this role instead of system:masters**
 
 **Trade-offs:**
+
 - ✅ More secure (limited blast radius)
 - ✅ Participants can't affect others
 - ❌ Can't practice cluster-wide operations
@@ -435,12 +443,14 @@ Happy learning!
 **Error:** "error: You must be logged in to the server (Unauthorized)"
 
 **Check 1: ConfigMap syntax**
+
 ```bash
 # Validate YAML syntax
 kubectl get configmap aws-auth -n kube-system -o yaml | kubectl apply --dry-run=client -f -
 ```
 
 **Check 2: User ARN correct**
+
 ```bash
 # Verify ARN matches exactly
 kubectl get configmap aws-auth -n kube-system -o yaml | grep "eks-charles"
@@ -450,6 +460,7 @@ aws iam get-user --user-name eks-charles --query 'User.Arn'
 ```
 
 **Check 3: Participant using correct AWS credentials**
+
 ```bash
 # Participant should run:
 aws sts get-caller-identity
@@ -464,6 +475,7 @@ aws sts get-caller-identity
 **Error:** "error: configmaps 'aws-auth' is invalid"
 
 **Solution:**
+
 ```bash
 # Restore from backup
 kubectl apply -f aws-auth-backup.yaml
@@ -486,6 +498,7 @@ kubectl apply -f aws-auth-backup.yaml
 ```
 
 **Prevention:**
+
 - Always backup before editing
 - Don't modify mapRoles section
 - Only add mapUsers section
@@ -526,11 +539,13 @@ All 7 participants can now:
 
 1. **Inform participants** - Send connection instructions
 2. **Direct them to:**
+
    - [00-SETUP-PREREQUISITES.md](../00-SETUP-PREREQUISITES.md) for tools
    - [SAFETY-GUIDELINES.md](../SAFETY-GUIDELINES.md) ⚠️ CRITICAL!
    - [PARTICIPANT-GUIDES/](../PARTICIPANT-GUIDES/) for learning
 
 3. **Monitor cluster:**
+
 ```bash
 # Watch cluster activity
 kubectl get events --all-namespaces --watch
@@ -554,4 +569,3 @@ kubectl get all --all-namespaces
 - [Kubernetes RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 - [EKS Best Practices - IAM](https://aws.github.io/aws-eks-best-practices/security/docs/iam/)
 - [system:masters Group](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
-
