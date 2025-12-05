@@ -18,33 +18,39 @@ spec:
         tier: frontend
     spec:
       containers:
-      - name: frontend
-        image: nginx:alpine  # Replace with your frontend image
-        ports:
-        - containerPort: 80
-          name: http
-        env:
-        - name: BACKEND_URL
-          value: "http://backend-service:3000"
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "50m"
-          limits:
-            memory: "128Mi"
-            cpu: "100m"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: frontend
+          image: 078288879769.dkr.ecr.ap-southeast-1.amazonaws.com/eks-workshop-apps:frontend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
 ---
 apiVersion: v1
 kind: Service
@@ -58,9 +64,8 @@ spec:
   selector:
     app: frontend
   ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 30080
-    protocol: TCP
-    name: http
-
+    - port: 80
+      targetPort: 8080
+      nodePort: 30081
+      protocol: TCP
+      name: http
