@@ -1,14 +1,18 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
+# IMPORTANT: Before creating your cluster, replace "CHANGEME" with your IAM username
+# Example: If your IAM user is "eks-thon", change "eks-CHANGEME-cluster" to "eks-thon-cluster"
+
 metadata:
-  name: training-cluster
+  name: eks-CHANGEME-cluster  # REPLACE: eks-thon-cluster, eks-pythia-cluster, etc.
   region: ap-southeast-1
   version: "1.28"
   tags:
     Project: EKS-Training
     Activity: Activity4-Scripted
     Environment: Development
+    Owner: CHANGEME  # REPLACE: with your IAM username
 
 # VPC Configuration - Cost Optimized
 vpc:
@@ -19,7 +23,7 @@ vpc:
 
 # Managed Node Group - Cost Optimized
 managedNodeGroups:
-  - name: training-nodes
+  - name: CHANGEME-nodes  # REPLACE: thon-nodes, pythia-nodes, etc.
     # Instance Configuration
     instanceType: t3.medium  # 2 vCPU, 4GB RAM
     spot: true  # 70% cost savings!
@@ -46,8 +50,9 @@ managedNodeGroups:
     tags:
       Project: EKS-Training
       Activity: Activity4
-      NodeGroup: training-nodes
+      NodeGroup: CHANGEME-nodes  # REPLACE: with your username
       ManagedBy: eksctl
+      Owner: CHANGEME  # REPLACE: with your IAM username
     
     # IAM Policies
     iam:

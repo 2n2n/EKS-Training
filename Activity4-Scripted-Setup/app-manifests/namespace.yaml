@@ -1,9 +1,13 @@
+# IMPORTANT: Before deploying, replace "CHANGEME" with your IAM username
+# Example: If your IAM user is "eks-thon", change "CHANGEME-todo-app" to "thon-todo-app"
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: todo-app
+  name: CHANGEME-todo-app  # REPLACE: thon-todo-app, pythia-todo-app, etc.
   labels:
-    name: todo-app
+    name: CHANGEME-todo-app  # REPLACE: with your namespace name
     project: eks-training
     activity: activity4
+    owner: CHANGEME  # REPLACE: with your IAM username
 

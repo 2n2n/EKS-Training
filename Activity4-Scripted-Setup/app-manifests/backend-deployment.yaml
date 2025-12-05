@@ -1,11 +1,15 @@
+# IMPORTANT: Replace "CHANGEME" with your IAM username throughout this file
+# Example: If your IAM user is "eks-thon", change "CHANGEME-todo-app" to "thon-todo-app"
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: todo-app
+  namespace: CHANGEME-todo-app  # REPLACE: thon-todo-app, pythia-todo-app, etc.
   labels:
     app: backend
     tier: backend
+    owner: CHANGEME  # REPLACE: with your IAM username
 spec:
   replicas: 2
   selector:
@@ -52,9 +56,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
-  namespace: todo-app
+  namespace: CHANGEME-todo-app  # REPLACE: thon-todo-app, pythia-todo-app, etc.
   labels:
     app: backend
+    owner: CHANGEME  # REPLACE: with your IAM username
 spec:
   type: ClusterIP  # Internal only
   selector:

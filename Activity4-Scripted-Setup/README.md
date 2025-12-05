@@ -4,6 +4,71 @@ Welcome to Activity 4! After manually creating a cluster in Activity 3, you'll n
 
 ---
 
+## 🔑 IMPORTANT: Personalize Your Setup First!
+
+**Each participant will create their OWN cluster with their OWN namespace.**
+
+👉 **Read the detailed guide:** [00-PERSONALIZATION-GUIDE.md](00-PERSONALIZATION-GUIDE.md)
+
+Before starting, you MUST replace `CHANGEME` with your IAM username in these files:
+1. `cluster-config.yaml` - Your cluster name
+2. `app-manifests/namespace.yaml` - Your namespace
+3. `app-manifests/backend-deployment.yaml` - Namespace references
+4. `app-manifests/frontend-deployment.yaml` - Namespace references
+
+### Example Usernames:
+- eks-thon → `eks-thon-cluster` and `thon-todo-app`
+- eks-pythia → `eks-pythia-cluster` and `pythia-todo-app`
+- eks-cronus → `eks-cronus-cluster` and `cronus-todo-app`
+- eks-rhea → `eks-rhea-cluster` and `rhea-todo-app`
+- eks-atlas → `eks-atlas-cluster` and `atlas-todo-app`
+- eks-helios → `eks-helios-cluster` and `helios-todo-app`
+- eks-selene → `eks-selene-cluster` and `selene-todo-app`
+
+### Quick Personalization (Copy-Paste Method):
+
+```bash
+# 1. Find your IAM username
+aws sts get-caller-identity --query Arn --output text
+# Example output: arn:aws:iam::123456789012:user/eks-thon
+
+# 2. Set your username as a variable (replace 'thon' with your username)
+export MY_USERNAME="thon"
+
+# 3. Navigate to Activity 4 directory
+cd /path/to/EKS-Training/Activity4-Scripted-Setup
+
+# 4. Replace CHANGEME in all files (macOS/Linux)
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" cluster-config.yaml
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" app-manifests/namespace.yaml
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" app-manifests/backend-deployment.yaml
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" app-manifests/frontend-deployment.yaml
+
+# 5. Verify changes
+grep -n "thon" cluster-config.yaml app-manifests/*.yaml
+```
+
+### Manual Personalization (If you prefer):
+
+Open each file and use Find & Replace:
+- Find: `CHANGEME`
+- Replace: `thon` (or your username)
+
+**⚠️ Don't skip this step!** Without personalization, all participants would create clusters with the same name, which will cause conflicts.
+
+### Verify Your Personalization:
+
+```bash
+# Run the validation script
+./validate-personalization.sh
+
+# Expected output:
+# ✅ PASS: All files validated
+# 🎉 SUCCESS! You're ready to create your cluster!
+```
+
+---
+
 ## 🎯 Learning Objectives
 
 By the end of this activity, you will:
@@ -88,23 +153,18 @@ Both activities create:
 ```
 Activity4-Scripted-Setup/
 ├── README.md (this file)
-├── ARCHITECTURE.md (architecture comparison)
-├── cluster-config.yaml (EKS configuration)
-├── 00-Kubernetes-Primitives-Overview.md (NEW!)
-├── 00-Monolith-vs-Microservices-Practice.md
-├── 01-Config-Explained.md
-├── 02-Eksctl-Deployment.md
-├── 03-Deploy-Application.md
-├── 04-Verification.md
-├── 05-CLEANUP.md
-├── cheatsheet.md
-└── app-manifests/
-    ├── namespace.yaml
-    ├── backend-deployment.yaml
-    ├── backend-service.yaml
-    ├── frontend-deployment.yaml
-    └── frontend-service.yaml
+├── 00-PERSONALIZATION-GUIDE.md (START HERE - Personalize files!)
+├── validate-personalization.sh (Run this to verify personalization!)
+├── cluster-config.yaml (EKS configuration - MUST personalize)
+├── 00-Kubernetes-Primitives-Overview.md
+├── app-manifests/ (Application manifests - MUST personalize)
+│   ├── namespace.yaml
+│   ├── backend-deployment.yaml
+│   └── frontend-deployment.yaml
+└── [Additional guides - optional]
 ```
+
+**⚠️ Files marked "MUST personalize" need CHANGEME replaced with your username!**
 
 ---
 
@@ -143,26 +203,49 @@ Microservices Architecture:
 If you've completed Activity 3 and understand the concepts:
 
 ```bash
+# 0. FIRST: Find your IAM username
+aws sts get-caller-identity --query Arn --output text
+# Example: arn:aws:iam::123456789012:user/eks-thon
+# Your username is: thon
+
 # 1. Navigate to this directory
 cd /path/to/Activity4-Scripted-Setup
 
-# 2. Review config file (optional but recommended)
+# 2. PERSONALIZE: Replace CHANGEME with your username (REQUIRED!)
+export MY_USERNAME="thon"  # Replace with YOUR username
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" cluster-config.yaml
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" app-manifests/*.yaml
+
+# 3. Verify personalization worked
+./validate-personalization.sh
+# This script checks all files and confirms you're ready!
+
+# OR manually verify:
+grep "$MY_USERNAME" cluster-config.yaml
+# Should see: name: eks-thon-cluster (or your username)
+
+# 4. Review your personalized config (optional but recommended)
 cat cluster-config.yaml
 
-# 3. Create cluster (one command!)
+# 5. Create YOUR cluster (one command!)
 eksctl create cluster -f cluster-config.yaml
 
-# 4. Wait 20 minutes ☕
+# 6. Wait 20 minutes ☕
+# Your cluster: eks-thon-cluster (or your username)
 
-# 5. Deploy microservices app
+# 7. Deploy microservices app to YOUR namespace
 kubectl apply -f app-manifests/
 
-# 6. Get access URL
+# 8. Verify deployment
+kubectl get pods -n ${MY_USERNAME}-todo-app
+kubectl get svc -n ${MY_USERNAME}-todo-app
+
+# 9. Get access URL
 kubectl get nodes -o wide
 # Access at: http://node-ip:30080
 
-# 7. When done, cleanup
-eksctl delete cluster --name training-cluster --region ap-southeast-1
+# 10. When done, cleanup YOUR cluster
+eksctl delete cluster --name eks-${MY_USERNAME}-cluster --region ap-southeast-1
 ```
 
 **That's it!** But please read the detailed guides to understand what's happening.
@@ -340,7 +423,9 @@ This is how real teams work:
 
 - [ ] Completed Activity 3 (or understand concepts)
 - [ ] All tools installed (Activity 2)
-- [ ] AWS CLI configured
+- [ ] AWS CLI configured with YOUR IAM user credentials
+- [ ] Know YOUR IAM username (e.g., eks-thon, eks-pythia)
+- [ ] **Personalized all YAML files with YOUR username**
 - [ ] Budget alert set
 
 ### During Activity
@@ -395,21 +480,30 @@ After completing this activity, ask yourself:
 
 You've completed Activity 4 when:
 
-- [ ] Cluster created with eksctl
-- [ ] 2 nodes Running
-- [ ] Frontend and Backend deployed separately
+- [ ] Files personalized with YOUR username (CHANGEME replaced)
+- [ ] YOUR cluster created with eksctl (e.g., eks-thon-cluster)
+- [ ] 2 nodes Running in YOUR cluster
+- [ ] Frontend and Backend deployed to YOUR namespace (e.g., thon-todo-app)
 - [ ] Frontend can communicate with Backend
 - [ ] Application accessible via browser
 - [ ] You understand IaC benefits
-- [ ] **Everything deleted**
+- [ ] **YOUR cluster and resources deleted**
 
 ---
 
 ## 🔗 Quick Links
 
+### Essential Files
+- **Personalization Guide:** [00-PERSONALIZATION-GUIDE.md](00-PERSONALIZATION-GUIDE.md) - Detailed setup instructions
+- **Validation Script:** [validate-personalization.sh](validate-personalization.sh) - Verify your setup
+- **Quick Reference Card:** [QUICK-REFERENCE-CARD.md](QUICK-REFERENCE-CARD.md) - Print and use!
+
+### For Instructors
+- **Participant Resources:** [PARTICIPANT-RESOURCES.md](PARTICIPANT-RESOURCES.md) - Track all 7 participants
+
+### Navigation
 - **Previous:** [../Activity3-Console-Setup/README.md](../Activity3-Console-Setup/README.md)
 - **Next:** [../Activity5-Advanced-Setup/README.md](../Activity5-Advanced-Setup/README.md)
-- **Cheatsheet:** [cheatsheet.md](cheatsheet.md)
 - **Sample App:** [../sample-app/](../sample-app/)
 
 ---
@@ -417,6 +511,22 @@ You've completed Activity 4 when:
 ## 🆘 Need Help?
 
 ### Common Issues
+
+**Forgot to personalize files:**
+```bash
+# Error: Cluster "eks-CHANGEME-cluster" already exists
+# Solution: Replace CHANGEME with your username
+export MY_USERNAME="thon"  # Your username
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" cluster-config.yaml
+sed -i.bak "s/CHANGEME/$MY_USERNAME/g" app-manifests/*.yaml
+```
+
+**Wrong namespace in commands:**
+```bash
+# Error: namespace "todo-app" not found
+# Solution: Use YOUR namespace
+kubectl get pods -n thon-todo-app  # Replace 'thon' with YOUR username
+```
 
 **eksctl not found:**
 ```bash
@@ -426,15 +536,16 @@ brew install eksctl  # macOS
 
 **AWS credentials error:**
 ```bash
-# Configure AWS CLI
+# Configure AWS CLI with YOUR IAM user
 aws configure
 aws sts get-caller-identity
+# Verify you see YOUR username in the ARN
 ```
 
 **Cluster creation fails:**
 ```bash
-# Check CloudFormation
-aws cloudformation list-stacks --region ap-southeast-1
+# Check CloudFormation for YOUR cluster
+aws cloudformation list-stacks --region ap-southeast-1 | grep eks-thon-cluster
 ```
 
 ### Getting Support
